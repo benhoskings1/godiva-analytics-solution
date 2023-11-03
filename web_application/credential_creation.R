@@ -11,9 +11,9 @@ df_credentials <- base::data.frame(
   stringsAsFactors = F
 )
 
-base::setwd(dir="/Users/benhoskings/Documents/RStudio/Coventry_Running/web_application")
+base::setwd(dir="/Users/benhoskings/Documents/RStudio/Coventry_Godiva/web_application")
 
-v_web_application_name <- "Coventry_Running"
+v_web_application_name <- "Coventry_Godiva"
 
 v_prepared_data_path <- "data/prepared_data/"
 v_database_path <- base::paste(v_prepared_data_path, v_web_application_name, ".db", sep="")

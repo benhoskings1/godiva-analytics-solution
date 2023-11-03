@@ -221,6 +221,23 @@ f_get_athlete_week_data <- function(all_data, athlete_id) {
     )
 }
 
+f_create_team_overview <- function(first_name, last_name, week, month) {
+  if (is.null(last_name)) {
+    name_string <- sprintf("%s", stringr::str_sub(first_name, 1, 1))
+  } else {
+    name_string <- sprintf("%s%s", stringr::str_sub(first_name, 1, 1),
+                           stringr::str_sub(last_name, 1, 1))
+  }
+
+  tags$div(
+    class="team_container",
+    style="width: 200px;",
+    tags$div(class="circle", name_string),
+    tags$div(class="week_dist_container", sprintf("Week: %2.2f", week)),
+    tags$div(class="month_dist_container", sprintf("Month: %2.2f", month))
+  )
+}
+
 f_create_activity_table <- function(week_data) {
 
   day_off <- "#a5c90f"; day_on <-"#D3D8DB";
@@ -402,3 +419,105 @@ f_create_activity_table <- function(week_data) {
 
   return(htmlTable)
 }
+
+
+
+# shiny::appendTab(
+#   inputId = "NP_Info",
+#
+#   tab = shiny::tabPanel(
+#     title = "User Administration",
+#     icon = shiny::icon(name = "users"),
+#
+#     shiny::wellPanel(
+#       shiny::h2("User Administration")
+#     ),
+#
+#     shinycssloaders::withSpinner(
+#       proxy.height = "200px",
+#       ui_element = rhandsontable::rHandsontableOutput(
+#         outputId = "rh_table_user_logins"
+#       )
+#     ),
+#
+#     shiny::hr(style="border=color: #9E9E9E"),
+#
+#     shiny::actionButton(
+#       inputId = "ab_user_admin_save_login",
+#       label = "Save Login Data",
+#       icon = shiny::icon("save")
+#     )
+#   )
+# )
+
+# shiny::appendTab(
+#   inputId = "NP_Info",
+#
+#   tab = shiny::tabPanel(
+#     title = "User Traffic",
+#     icon = shiny::icon("mouse-pointer"),
+#
+#     shiny::wellPanel(
+#       shiny::h2("User Traffic"),
+#
+#       shiny::fluidRow(
+#         shiny::column(
+#           width = 6,
+#           align = "center",
+#
+#           shiny::dateRangeInput(
+#             inputId = "dri_info_user_traffic",
+#             label = "Time Range for Connections",
+#             start = gl_min_date,
+#             end = base::Sys.Date(),
+#             min = gl_min_date,
+#             max = base::Sys.Date(),
+#             separator = "until",
+#             weekstart = 1,
+#             format = "dd/mm/yyyy"
+#           )
+#         ),
+#         shiny::column(
+#           width = 6,
+#           align = "center",
+#           shiny::selectInput(
+#             inputId = "si_web_application_users",
+#             label = "Web Application Users",
+#             choices = gl_l_users,
+#             selected = gl_l_users[1],
+#             multiple = T
+#           )
+#         )
+#       ),
+#
+#       shiny::fluidRow(
+#         align = "center",
+#         shiny::actionButton(
+#           inputId = "ab_evaluate_usee_traffic",
+#           label = "Evaluate User Traffic",
+#           icon = shiny::icon("play")
+#         )
+#       )
+#     ), # end well panel
+#
+#     shiny::h3("Connections per User"),
+#
+#     shinycssloaders::withSpinner(
+#       proxy.height = "200px",
+#       ui_element = plotly::plotlyOutput(
+#         outputId = "plo_plot_connections_per_user"
+#       )
+#     ),
+#
+#     shiny::hr(style="border-color: #9E9E9E"),
+#
+#     shiny::h3("Connection Log"),
+#
+#     shinycssloaders::withSpinner(
+#       proxy.height = "200px",
+#       ui_element = rhandsontable::rHandsontableOutput(
+#         outputId = "rh_table_log_connections"
+#       )
+#     )
+#   )
+# )

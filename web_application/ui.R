@@ -84,6 +84,35 @@ ui <- shiny::fluidPage(
         'profile_pic activity_overview activity_overview'
         'profile_pic activity_overview activity_overview';
     }
+
+    .circle {
+      grid-area: name_holder;
+      width: 100px;
+      height: 100px;
+      line-height: 100px;
+      border-radius: 50%;
+      font-size: 50px;
+      border-style: solid;
+      border-width: 2px;
+      color: #3F3F3F;
+      text-align: center;
+    }
+
+    .week_dist_container {
+      grid-area: week_dist;
+    }
+
+    .month_dist_container {
+      grid-area: month_dist;
+    }
+
+    .team_container {
+      display: grid;
+      column-gap:5px;
+      grid-template-areas:
+        'name_holder week_dist'
+        'name_holder month_dist';
+    }
     "),
 
   # Authentication
@@ -181,51 +210,10 @@ ui <- shiny::fluidPage(
       title = "",
       width = 12,
 
-      # Tab No. 1 ----------
-      shiny::tabPanel(
-        title = tags$div(class="tab_title", "Info"),
-
-        shiny::wellPanel(
-          id = "WP_Info",
-          style = "background: white",
-
-          shiny::navlistPanel(
-            id = "NP_Info",
-            well = F,
-            widths = c(2, 10),
-
-            shiny::tabPanel(
-              title = "Content",
-              icon = shiny::icon("eye"),
-
-              shiny::h2("Welcome!"),
-              shiny::br(),
-              shiny::p("What is the use of this application"),
-              shiny::br(),
-              shiny::p("Thanks for visiting"),
-              shiny::br(),
-              shiny::p("Best Regards from the project team"),
-              shiny::br(),
-              shiny::p(
-                "Ideas and feedback are welcome!",
-                shiny::br(),
-                "Please contact: benjaminhoskings@gmail.com"
-              )
-            ),
-
-            shiny::tabPanel(
-              title = "Used Data",
-              icon = shiny::icon("database"),
-
-              shiny::h2("What data is used in this app?")
-            )
-          )
-        )
-      ),
-
       # Personal Tab -------
       shiny::tabPanel(
-        title = "Personal Tab",
+        title = tags$div(class="tab_title", "Athlete Overview"),
+        value = "Athlete_Overview",
         shiny::wellPanel(
           id = "WP_Personal",
           style = "background: white",
@@ -303,7 +291,7 @@ ui <- shiny::fluidPage(
 
       # Activity Input Tab -------
       shiny::tabPanel(
-        title = "Record Activity",
+        title = tags$div(class="tab_title", "Record Activity"),
 
         shiny::wellPanel(
           id = "WP_Activity",
@@ -381,8 +369,7 @@ ui <- shiny::fluidPage(
             )
           )
         )
-      ),
-      shiny::uiOutput("admin_tab")
+      )
     )
   )
 )

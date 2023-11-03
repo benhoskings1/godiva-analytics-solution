@@ -42,7 +42,7 @@ member_data <- readr::read_tsv("data/prepared_data/Member_Data.tsv", show_col_ty
 v_functions_path <- "app_functions.R"
 v_global_session_path <- "global_session.R"
 v_prepared_data_path <- "data/prepared_data/"
-v_database_path <- base::paste(v_prepared_data_path, "Coventry_Running.db", sep="")
+v_database_path <- base::paste(v_prepared_data_path, "Coventry_Godiva.db", sep="")
 
 # Load app functions ------
 base::source(v_functions_path)

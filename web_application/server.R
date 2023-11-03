@@ -22,8 +22,11 @@ server <- function(input, output, session) {
     check_credentials = shinymanager::check_credentials(df_credentials)
   )
 
-  shiny::observe(
+  shiny::observe({
     user_data <<- shiny::reactiveValuesToList(auth)$user_info
+    # print(shiny::reactiveValuesToList(auth))
+  }
+
   )
 
   # usage tracking -------
@@ -81,115 +84,44 @@ server <- function(input, output, session) {
         v_is_admin <- user_data$admin
 
         if(v_is_admin) {
-          shiny::appendTab(
-            inputId = "NP_Info",
-
-            tab = shiny::tabPanel(
-              title = "User Administration",
-              icon = shiny::icon(name = "users"),
-
+          ## Append admin tab ------
+          shiny::insertTab(
+            inputId = "TabBox01",
+            target = "Athlete_Overview",
+            position = c("before"),
+            shiny::tabPanel(
+              title = tags$div(class="tab_title", "Team Overview"),
               shiny::wellPanel(
-                shiny::h2("User Administration")
-              ),
+                id = "WP_Team_Overview",
+                style = "background: white",
 
-              shinycssloaders::withSpinner(
-                proxy.height = "200px",
-                ui_element = rhandsontable::rHandsontableOutput(
-                  outputId = "rh_table_user_logins"
+                tags$div(
+                  purrr::map(member_data$ID, ~ {
+                    f_create_team_overview(
+                      member_data |>
+                        dplyr::filter(ID == .x) |>
+                        dplyr::pull(First_name),
+                      member_data |>
+                        dplyr::filter(ID == .x) |>
+                        dplyr::pull(Last_Name),
+                      20, 50
+                    )
+                  })
                 )
-              ),
 
-              shiny::hr(style="border=color: #9E9E9E"),
 
-              shiny::actionButton(
-                inputId = "ab_user_admin_save_login",
-                label = "Save Login Data",
-                icon = shiny::icon("save")
               )
             )
           )
 
+
           shiny::appendTab(
-            inputId = "NP_Info",
-
-            tab = shiny::tabPanel(
-              title = "User Traffic",
-              icon = shiny::icon("mouse-pointer"),
-
-              shiny::wellPanel(
-                shiny::h2("User Traffic"),
-
-                shiny::fluidRow(
-                  shiny::column(
-                    width = 6,
-                    align = "center",
-
-                    shiny::dateRangeInput(
-                      inputId = "dri_info_user_traffic",
-                      label = "Time Range for Connections",
-                      start = gl_min_date,
-                      end = base::Sys.Date(),
-                      min = gl_min_date,
-                      max = base::Sys.Date(),
-                      separator = "until",
-                      weekstart = 1,
-                      format = "dd/mm/yyyy"
-                    )
-                  ),
-                  shiny::column(
-                    width = 6,
-                    align = "center",
-                    shiny::selectInput(
-                      inputId = "si_web_application_users",
-                      label = "Web Application Users",
-                      choices = gl_l_users,
-                      selected = gl_l_users[1],
-                      multiple = T
-                    )
-                  )
-                ),
-
-                shiny::fluidRow(
-                  align = "center",
-                  shiny::actionButton(
-                    inputId = "ab_evaluate_usee_traffic",
-                    label = "Evaluate User Traffic",
-                    icon = shiny::icon("play")
-                  )
-                )
-              ), # end well panel
-
-              shiny::h3("Connections per User"),
-
-              shinycssloaders::withSpinner(
-                proxy.height = "200px",
-                ui_element = plotly::plotlyOutput(
-                  outputId = "plo_plot_connections_per_user"
-                )
-              ),
-
-              shiny::hr(style="border-color: #9E9E9E"),
-
-              shiny::h3("Connection Log"),
-
-              shinycssloaders::withSpinner(
-                proxy.height = "200px",
-                ui_element = rhandsontable::rHandsontableOutput(
-                  outputId = "rh_table_log_connections"
-                )
-              )
-            )
-          )
-
-          ### Add button to set as default
-
-          output$admin_tab <- shiny::renderUI(
+            inputId = "TabBox01",
             shiny::tabPanel(
               title = tags$div(class="tab_title", "Admin Tab"),
               shiny::wellPanel(
                 id = "WP_Admin",
                 style = "background: white",
-
                 shiny::navlistPanel(
                   id = "NP_Admin",
                   well = F,
@@ -199,14 +131,96 @@ server <- function(input, output, session) {
                     title = "Session Input",
 
                     shiny::h2("Input session details here!"),
+                    shiny::fluidRow(
+                      shiny::column(
+                        width = 6,
+                        shiny::dateInput(
+                          inputId = "di_activity_date",
+                          label = "Date of Session",
+                          value = Sys.Date(),
+                          format = "D d MM"
+                        ),
+                        shiny::selectInput(
+                          inputId = "si_session_type",
+                          label = "Session Type",
+                          choices = c("Reps"="R", "Pyramid"="P"),
+                          selected = c("Reps"="R")
+                        ),
+                        shiny::numericInput(
+                          inputId = "ni_rep_dist",
+                          label = "Rep Distance",
+                          value = 1000,
+                          min=100
+                        ),
+                        shiny::fluidRow(
+                          shiny::column(
+                            width = 6,
+                            shiny::numericInput(
+                              inputId = "ni_set_count",
+                              label = "Set Count",
+                              value = 1,
+                              min=1
+                            )
+                          ),
+                          shiny::column(
+                            width = 6,
+                            shiny::numericInput(
+                              inputId = "ni_set_rest",
+                              label = "Set Rest (seconds)",
+                              value = 0,
+                              min=1
+                            )
+                          )
+                        ),
+                        shiny::fluidRow(
+                          shiny::column(
+                            width = 6,
+                            shiny::numericInput(
+                              inputId = "ni_rep_count",
+                              label = "Rep Count",
+                              value = 6,
+                              min = 1
+                            )
+                          ),
+                          shiny::column(
+                            width = 6,
+                            shiny::numericInput(
+                              inputId = "ni_rep_rest",
+                              label = "Rep Rest (seconds)",
+                              value = 60,
+                              min=1
+                            )
+                          )
+                        )
+                      ),
+                      shiny::column(
+                        width=6,
+                        checkboxGroupInput(
+                          "checkGroup",
+                          label = "Athlete Select",
+                          choices = {
+                            names(member_data$App_Username) <- member_data$ID
+                          }
+                        )
+                      )
+                    ),
+
                     shiny::br(),
                     shiny::h4("Select who attended!")
+                  ),
+
+                  shiny::tabPanel(
+                    title = "Second Tab",
+                    icon = shiny::icon("database"),
+
+                    shiny::h2("What data is used in this app?")
                   )
                 )
               )
             )
           )
 
+          ## Add button to set as default ----
           output$session_buttons <- shiny::renderUI(
             shiny::fluidRow(
               shiny::column(
@@ -227,8 +241,6 @@ server <- function(input, output, session) {
           )
 
         } else {
-          output$admin_tab <- NULL
-
           output$session_buttons <- shiny::renderUI(
             shiny::fluidRow(
               shiny::column(
