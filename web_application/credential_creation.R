@@ -6,7 +6,8 @@ df_credentials <- base::data.frame(
   strava_id = c(NA, "963223"),
   start = c("2020-01-01", "2020-01-01"),
   expire = c(NA, NA),
-  admin = c(T, F),
+  # 2 is full access, 1 is godiva access, 0 is personal access
+  admin_level = c(2, 0),
   comment = "Secure authentification for app",
   stringsAsFactors = F
 )

@@ -95,21 +95,25 @@ server <- function(input, output, session) {
                 id = "WP_Team_Overview",
                 style = "background: white",
 
-                tags$div(
-                  purrr::map(member_data$ID, ~ {
-                    f_create_team_overview(
-                      member_data |>
-                        dplyr::filter(ID == .x) |>
-                        dplyr::pull(First_name),
-                      member_data |>
-                        dplyr::filter(ID == .x) |>
-                        dplyr::pull(Last_Name),
-                      20, 50
+                tags$table(
+                  tags$tbody(
+                    tags$tr(
+                      purrr::map(member_data$ID, ~ {
+                        tags$td(
+                          f_create_team_overview(
+                            member_data |>
+                              dplyr::filter(ID == .x) |>
+                              dplyr::pull(First_name),
+                            member_data |>
+                              dplyr::filter(ID == .x) |>
+                              dplyr::pull(Last_Name),
+                            20, 50
+                          )
+                        )
+                      })
                     )
-                  })
+                  )
                 )
-
-
               )
             )
           )
