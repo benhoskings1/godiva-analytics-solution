@@ -5,5 +5,5 @@ http://www.strava.com/oauth/authorize?client_id=111130&response_type=code&redire
 
 Then provide full access and copy and send the link in your search bar to me!
 
-(Should loook like this)
+(Should look something like this)
 http://localhost/exchange_token?state=&code=YOUR_CODE_IS_HERE&scope=read,activity:read_all,profile:read_all    
