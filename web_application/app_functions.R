@@ -261,7 +261,8 @@ f_create_activity_table <- function(week_data) {
     "Ride" = as.character(icon("bicycle", lib = "font-awesome")),
     "MountainBikeRide" = as.character(icon("bicycle", lib = "font-awesome")),
     "Swim" = as.character(icon("person-swimming", lib = "font-awesome")),
-    "Hike" = as.character(icon("person-hiking", lib = "font-awesome")))
+    "Hike" = as.character(icon("person-hiking", lib = "font-awesome")),
+    "Walk" = as.character(icon("person-walking", lib = "font-awesome")))
 
   day_start <- lubridate::wday(Sys.time(), week_start = getOption("lubridate.week.start", 1))
 

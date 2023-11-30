@@ -29,7 +29,12 @@ ui <- shiny::fluidPage(
     @import url(https://use.fontawesome.com/releases/v5.7.2/css/all.css);
 
     table, th, td {
+      border-collapse: collapse;
       border: 2px solid; text-align: center;
+    }
+
+    td, th, tr, tbody {
+        padding: .5em; border: 2px solid;
     }
 
     well {
@@ -367,7 +372,26 @@ ui <- shiny::fluidPage(
                 textOutput("palette")
               )
             )
-          )
+          ),
+          shiny::textAreaInput(
+            inputId = "ti_activity_overview",
+            label = "How was your session?"
+          ),
+
+          # 0-10 how was your session
+
+          shiny::fluidRow(
+            shiny::column(
+              12,
+              purrr::map(0:10, function(num) {
+                shiny::actionButton(
+                  inputId = sprintf("ab_scale_%d", num),
+                  label = num
+                )
+              })
+            )
+          ),
+          shiny::textOutput("activity_rating")
         )
       )
     )

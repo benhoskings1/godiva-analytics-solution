@@ -1,4 +1,13 @@
-ID	Name	Strava_Username	App_Username	First_name	Last_Name
-38807221	Ben	ben_hoskings	ben_hoskings	Ben	Hoskings
-963223	Neil	nhoskings	neil_hoskings	Neil	Hoskings
-001	Clarky	c_roberts	clark_roberts	Clark	Roberts
+First_Name	Last_Name	ID	Group	Username
+Ben	Hoskings	38807221	Godiva	Ben_Hoskings
+Neil	Hoksings	963223	Hosko	Neil_Hoskings
+Becky	Hoskings	98588012	Hosko	Becky_Hoskings
+Test	1	001	Godiva	Test_1
+Test	2	002	Godiva	Test_2
+Test	3	003	Godiva	Test_3
+Test	4	004	Godiva	Test_4
+Test	5	005	Godiva	Test_5
+Test	6	006	Godiva	Test_6
+Test	7	007	Godiva	Test_7
+Test	8	008	Godiva	Test_8
+

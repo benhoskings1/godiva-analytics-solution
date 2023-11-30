@@ -95,29 +95,52 @@ server <- function(input, output, session) {
                 id = "WP_Team_Overview",
                 style = "background: white",
 
+                # create a 4xY grid of athlete info
                 tags$table(
+                  style="gap: 10px;",
                   tags$tbody(
-                    tags$tr(
-                      purrr::map(member_data$ID, ~ {
-                        tags$td(
-                          f_create_team_overview(
-                            member_data |>
-                              dplyr::filter(ID == .x) |>
-                              dplyr::pull(First_name),
-                            member_data |>
-                              dplyr::filter(ID == .x) |>
-                              dplyr::pull(Last_Name),
-                            20, 50
-                          )
-                        )
-                      })
-                    )
-                  )
+                    style="gap: 10px;",
+                    {
+                    rows <- base::ceiling(base::nrow(member_data) / 4)
+
+                    purrr::map(c(1:rows), function(row_idx) {
+                      tags$tr(
+                        purrr::map(1:4, function(col_idx) {
+                          if (((row_idx-1)*4 + col_idx) <= base::nrow((member_data))) {
+                            member_id <- member_data$ID[(row_idx-1)*4 + col_idx]
+
+                            tags$td(
+                              f_create_team_overview(
+                                member_data |>
+                                  dplyr::filter(ID == member_id) |>
+                                  dplyr::pull(First_Name),
+                                member_data |>
+                                  dplyr::filter(ID == member_id) |>
+                                  dplyr::pull(Last_Name),
+                                activities_detailed |>
+                                  dplyr::filter(Athlete_ID == member_id) |>
+                                  dplyr::filter(start_date > Sys.Date() - lubridate::days(6)) |>
+                                  dplyr::filter(sport_type == "Run") |>
+                                  dplyr::pull(distance) |>
+                                  sum() / 1000,
+                                activities_detailed |>
+                                  dplyr::filter(Athlete_ID == member_id) |>
+                                  dplyr::filter(start_date > Sys.Date() - lubridate::days(30)) |>
+                                  dplyr::filter(sport_type == "Run") |>
+                                  dplyr::pull(distance) |>
+                                  sum() / 1000
+                              )
+                            )
+                          }
+                        })
+                      )
+                    })
+
+                  })
                 )
               )
             )
           )
-
 
           shiny::appendTab(
             inputId = "TabBox01",
@@ -203,7 +226,7 @@ server <- function(input, output, session) {
                           "checkGroup",
                           label = "Athlete Select",
                           choices = {
-                            names(member_data$App_Username) <- member_data$ID
+                            names(member_data$Username) <- member_data$ID
                           }
                         )
                       )
@@ -402,7 +425,7 @@ server <- function(input, output, session) {
 
       first_name <- member_data |>
         dplyr::filter(ID == input$si_person_filter) |>
-        dplyr::pull(Name)
+        dplyr::pull(First_Name)
       last_name <- member_data |>
         dplyr::filter(ID == input$si_person_filter) |>
         dplyr::pull(Last_Name)
@@ -475,6 +498,25 @@ server <- function(input, output, session) {
       })
     )
   })
+
+  output$activity_rating <- shiny::renderText("unset")
+
+  shiny::observe(
+    purrr::map(0:10, function(num) {
+      shiny::observeEvent(
+        input[[sprintf("ab_scale_%d", num)]], {
+          shiny::updateActionButton(
+            sprintf("ab_scale_%d", num),
+            style="background-color: #FF0000"
+          )
+          output$activity_rating <- shiny::renderText(num)
+        }
+      )
+
+    })
+  )
+
+
 
   shiny::observeEvent(
     input$ab_submit_session,
