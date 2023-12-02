@@ -1,0 +1,74 @@
+/* Layout and styles */
+
+/*Profile Section */
+.profile_layout {
+  display: grid;
+  grid-template-areas:
+    'sidebar profile_overview';
+  gap: 20px;
+  grid-template-columns: 20% calc(80% - 20px);
+}
+
+.profile_overview {
+  display: grid;
+  grid-template-areas:
+    'profile_pic name'
+    'profile_pic activity_overview'
+    'age event';
+  grid-template-columns: 30% 70%;
+  column-gap: 20px;
+  row-gap: 5px
+}
+
+.profile_pic {
+  max-height: 200px; border-radius: 10%;
+  display: flex; justify-content: center; align-items: center;
+}
+
+.activity_container {
+  grid-area: activity;
+  display: grid;
+  grid-template-areas:
+    'icon icon type'
+    'icon icon dist'
+    'icon icon time';
+}
+
+.overview_table {
+  align-content: center; table-layout: fixed;
+  border: none; width: calc(100% - 20px);
+  border-collapse: separate; border-spacing: 5px;
+
+}
+
+.overview_data {
+  background-color: white; border-radius: 5px;
+  padding: 1em; border: 2px solid; width: 100%;
+}
+
+.calendar {
+  width: 100%;
+  padding: none;
+  table-layout: fixed;
+}
+
+.calendar_row {
+  padding: none;
+}
+
+.calendar_cell {
+  border: 2px solid black;
+  padding: none;
+  vertical-align:top;
+  padding: 5px;
+}
+
+.cal_date_num {
+  text-align: right;
+  font-size: 10px;
+  color: #3F3F3F;
+}
+
+.cal_head {
+  border: 2px solid black;
+}

@@ -5,8 +5,11 @@ ui <- shiny::fluidPage(
   title = "",
   theme = shinythemes::shinytheme("flatly"),
 
+  shinyWidgets::setBackgroundColor("#F5F9FC"),
+
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "app_style.css")
+    tags$link(rel = "stylesheet", type = "text/css", href = "app_style.css"),
+    tags$link(rel = "stylesheet", type = "text/css", href = "layouts.css")
   ),
 
   waiter::useWaiter(),
@@ -31,11 +34,14 @@ ui <- shiny::fluidPage(
           id = "WP_Team_Overview",
           style = "background: #FFFFFF",
 
-          tags$div(class="data_container", "TEAM REPS"),
+          tags$div(class="data_container",
+            tags$div(class="grid_title", "Team Overview")
+          ),
           tags$br(style="height: 50px"),
 
           ## Team Table ------
           tags$div(class="data_container",
+            tags$div(class="grid_title", "Team Summary"),
             tags$table(class="team_table", {
               rows <- base::ceiling(base::nrow(member_data) / 4)
               purrr::map(c(1:rows), function(row_idx) {
@@ -75,6 +81,62 @@ ui <- shiny::fluidPage(
         )
       ),
 
+      shiny::tabPanel(
+        title = tags$div(class="tab_title", "Athlete Overview 2"),
+        value = "Athlete_Overview_2",
+        shiny::wellPanel(
+          style = "background: white;",
+          tags$div(class="profile_layout",
+            tags$div(class="data_container",
+              tags$div(style="grid-area: sidebar",
+                shiny::selectInput(
+                  inputId = "athlete_filter",
+                  label = "Select Athelete",
+                  choices = unique(activities_detailed$Athlete_ID)
+                ),
+                shiny::dateRangeInput(
+                  inputId = "activity_range_filter",
+                  label = "Date range",
+                  format = "dd-M",
+                  start = today - lubridate::days(7),
+                  end   = today,
+                ),
+                shiny::selectInput(
+                  inputId = "activity_day_filter",
+                  label = "Day Filter",
+                  choices = c("None"=NA, week_days)
+                ),
+                shiny::selectInput(
+                  inputId = "activity_type_filter",
+                  label = "Activity Type",
+                  choices = c("None"=NA, "Run")
+                )
+              )
+            ),
+            tags$div(class="data_container",
+              tags$div(class="profile_overview", style="width: 100%; height: 100%",
+                tags$div(class="grid_item", style="grid-area: profile_pic",
+                  shiny::uiOutput("im_profile_pic")
+                ),
+                tags$div(style="grid-area: activity_overview",
+                  tags$div("Weekly Summary"),
+                  shiny::uiOutput("activity_summary")
+                ),
+                tags$div(class="grid_title", style="grid-area: name; font-size: 24px;",
+                  shiny::htmlOutput("name_string")
+                ),
+                tags$div(class="grid_item", style="grid-area: age;", "Age: 21"),
+                tags$div(class="grid_item", style="grid-area: event;", "Event: 800m"),
+              )
+            )
+          ),
+          tags$br(style="height: 50px"),
+          tags$div(class="data_container",
+            shiny::uiOutput("athlete_activity_calendar")
+          )
+        )
+      ),
+
 
       # Personal Tab -------
       shiny::tabPanel(
@@ -109,16 +171,13 @@ ui <- shiny::fluidPage(
                   class="profile_container",
                   tags$div(
                     class="profile_pic_container",
-                    shiny::uiOutput("im_profile_pic"),
                     tags$div(
-                      shiny::htmlOutput("name_string"),
                       style="padding: 10px; display: flex;"
                     )
 
                   ),
                   tags$div(
-                    class="activity_overview_container",
-                    shiny::uiOutput("activity_summary")
+                    class="activity_overview_container"
                   )
                 )
               ),

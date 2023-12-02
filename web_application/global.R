@@ -77,3 +77,7 @@ if (base::file.exists(base::paste(v_prepared_data_path, "session_data.tsv", sep=
 RSQLite::dbDisconnect(conn = con_SQLite)
 v_last_data_update = base::Sys.Date()
 
+week_days <- c("Monday"=1, "Tuesday"=2, "Wednesday"=3, "Thurdsay"=4,
+               "Friday"=5, "Saturday"=6, "Sunday"=7)
+
+today <- base::Sys.Date()

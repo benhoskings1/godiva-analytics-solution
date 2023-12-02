@@ -1,3 +1,15 @@
+
+get_sport_icon <- function(sport_type) {
+  icon <- switch (sport_type,
+    "Run" = icon("running", lib = "font-awesome"),
+    "Ride" = icon("bicycle", lib = "font-awesome"),
+    "Stopwatch" = icon("stopwatch", lib = "font-awesome"),
+    "Swim" = icon("person-swimming", lib = "font-awesome"),
+    icon("dumbbell", lib="font-awesome")
+  )
+
+}
+
 f_load_credentials <- function() {
   con_SQLite <- RSQLite::dbConnect(drv=RSQLite::SQLite(), dbname = v_database_path)
 
@@ -41,11 +53,13 @@ f_pull_data <- function(data, day, cat) {
   } else " "
 }
 
-f_get_athlete_week_data <- function(all_data, athlete_id) {
+f_get_athlete_week_data <- function(all_data, athlete_id, date_range) {
   week_data <- all_data |>
     dplyr::filter(
       Athlete_ID == athlete_id,
-      start_date > Sys.Date() - lubridate::days(6)) |>
+      dplyr::between(start_date,
+                     lubridate::as_date(date_range[1]),
+                     lubridate::as_date(date_range[2]))) |>
     dplyr::mutate(
       title = name,
       days_since = Sys.Date() - lubridate::as_date(start_date)
