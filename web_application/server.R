@@ -10,6 +10,12 @@ server <- function(input, output, session) {
     # week_sessions =
   )
 
+  athlete_data <- shiny::reactiveValues(
+    week_activities = f_get_athlete_week_data(activities_detailed, "38807221", c(today, today - lubridate::days(6))),
+    display_activities = f_get_athlete_week_data(activities_detailed, "38807221", c(today, today - lubridate::days(6))),
+    name_string = "", age_string = ""
+  )
+
   ## Define reactive outputs ------
   output$activity_summary <- shiny::renderUI(
     tags$table(class="overview_table",
@@ -17,10 +23,10 @@ server <- function(input, output, session) {
         tags$td(class="overview_data",
           tags$div(class="activity_container", style="gap: 10px",
             tags$div(style="grid-area: type", "Activities"),
-            tags$div(style="grid-area: dist", base::nrow(rv_personal_tab$week_data)
+            tags$div(style="grid-area: dist", base::nrow(athlete_data$week_activities)
             ),
             tags$div(style="grid-area: time", {
-              total_time <- rv_personal_tab$week_data |>
+              total_time <- athlete_data$week_activities |>
                 dplyr::pull(elapsed_time) |>
                 base::sum()
               format(lubridate::as_datetime(
@@ -35,12 +41,12 @@ server <- function(input, output, session) {
           tags$div(class="activity_container", style="gap: 10px",
             tags$div(style="grid-area: type", "Runs"),
             tags$div(style="grid-area: dist", base::nrow(
-              rv_personal_tab$week_data |>
+              athlete_data$week_activities |>
                 dplyr::filter(sport_type == "Run")
               )
             ),
             tags$div(style="grid-area: time", {
-              total_time <- rv_personal_tab$week_data |>
+              total_time <- athlete_data$week_activities |>
                 dplyr::filter(sport_type == "Run") |>
                 dplyr::pull(elapsed_time) |>
                 base::sum()
@@ -71,77 +77,46 @@ server <- function(input, output, session) {
 
   output$athlete_activity_calendar <- shiny::renderUI({
     start_end <- input$activity_range_filter
-    date_range <- (lubridate::as_date(start_end[2]) - lubridate::as_date(start_end[1]))
+    generate_calendar(start_end, athlete_data$display_activities)
+  })
 
-    first_monday <- lubridate::as_date(start_end[1]) - lubridate::wday(lubridate::as_date(start_end[1]), week_start=1)+1
-
-    next_sunday <- base::Sys.Date()+(7-lubridate::wday(today, week_start=1))
+  output$day_calendar <-shiny::renderUI({
+    start_end <- input$activity_range_filter
+    day_idx <- base::as.numeric(input$activity_day_filter)
+    print(start_end[1])
+    selected_day <- names(week_days)[day_idx]
+    first_day <- lubridate::as_date(start_end[1]) +
+      (8 - lubridate::wday(lubridate::as_date(start_end[1]), week_start=1)) -
+      (day_idx)
+    print(first_day)
 
     tags$table(class="calendar",
-      tags$tr(
-        purrr::map(names(week_days), function(name) tags$td(class="cal_head", name))
-      ), {
-      rows <- base::ceiling((today - first_monday) / 7)
-      purrr::map(c(1:rows), function(row_idx) {
-        tags$tr(class="calendar_row",
-          purrr::map(1:7, function(col_idx) {
-            cell_date <- (next_sunday - (rows-row_idx)*7 - (7-col_idx))
-            activities <- rv_personal_tab$week_data |>
-              dplyr::filter(lubridate::as_date(start_date) == cell_date)
-
-            bg_colour <- if (!dplyr::between(cell_date, start_end[1], start_end[2])) {
-              "#a9a9a9"
-            } else if (nrow(activities) > 0) {
-              "rgba(0,255,0,0.3);"
-            } else {"rgba(228,228,228,0.3);"}
-
-            tags$td(class="calendar_cell",
-              style=sprintf("background-color: %s", bg_colour),
-              tags$div(class="cal_date_num", {
-                if (lubridate::day(cell_date) == 1) {
-                  format(cell_date, "%d-%b")
-                } else {format(cell_date, "%d")}
-                }
-
-              ),
-              if(nrow(activities) > 0) {
-                main <- activities |> dplyr::filter(elapsed_time == max(elapsed_time))
-
-                print(get_sport_icon(main$sport_type))
-                tags$div(class="activity_container",
-                  tags$div(class="grid_item", style="grid-area: icon; font-size: 32px",
-                    get_sport_icon(main$sport_type)
-                  ),
-                  tags$div(style="grid-area: type;", main$sport_type),
-                  tags$div(style="grid-area: dist;", sprintf("%.2f km", main$distance/1000)),
-                  tags$div(style="grid-area: time;",
-                    format(
-                      lubridate::as_datetime(lubridate::seconds(main$elapsed_time)), "%H:%M:%S"
-                    )
-                  ),
-                )
-              }
-            )
-          })
-        )
-      })
-    })
+      tags$tr(purrr::map(base::rep(selected_day, 4), function(name) {
+        cell_date <- first_day
+        tags$td(class = "cal_head", format(cell_date, "%A %d %b"))
+      }))
+    )
   })
+
+  output$activity_table <- renderText(HTML(f_create_activity_table(athlete_data$display_activities)))
+  output$name_string <- shiny::renderText(athlete_data$name_string)
+  output$age_string <- shiny::renderText(athlete_data$age_string)
 
   ## Define observe events -----
   shiny::observeEvent(
-    eventExpr = {
-      input$athlete_filter
-      input$activity_range_filter
-      },
+    eventExpr = input$athlete_filter,
     handlerExpr = {
-      rv_personal_tab$week_data <- f_get_athlete_week_data(
+      athlete_data$week_activities <- f_get_athlete_week_data(
+        activities_detailed,
+        input$athlete_filter,
+        c(today - lubridate::days(6), today)
+      )
+
+      athlete_data$display_activities <- f_get_athlete_week_data(
         activities_detailed,
         input$athlete_filter,
         input$activity_range_filter
       )
-
-      output$activity_table <- renderText(HTML(f_create_activity_table(rv_personal_tab$week_data)))
 
       first_name <- member_data |>
         dplyr::filter(ID == input$athlete_filter) |>
@@ -150,38 +125,21 @@ server <- function(input, output, session) {
         dplyr::filter(ID == input$athlete_filter) |>
         dplyr::pull(Last_Name)
 
-      output$name_string <- shiny::renderText(
-        sprintf("<b>%s %s</b>", first_name, last_name)
-      )
-      output$age_string <- shiny::renderText("<b>Age: </b>")
-
-      updateSelectInput(
-        session, "si_day_filter",
-        label = "Select Day",
-        choices = {
-          value_options <- unique(rv_personal_tab$week_data$days_since)
-          day_options <- unique(lubridate::as_date(rv_personal_tab$week_data$start_date))
-          day_names <- format(day_options, format="%a %d %b")
-          names(value_options) <- day_names
-          sort(value_options)
-        }
-      )
+      athlete_data$name_string <- sprintf("<b>%s %s</b>", first_name, last_name)
+      athlete_data$age_string <- "<b>Age: </b>"
     }
-
   )
 
   shiny::observeEvent(
-    eventExpr = input$si_day_filter,
+    eventExpr = input$activity_range_filter,
     handlerExpr = {
-      output$day_table <- DT::renderDataTable(
-        rv_personal_tab$week_data |>
-          dplyr::filter(days_since == input$si_day_filter),
-        # options = list(scrollX = TRUE),
-        rownames = FALSE)
+      athlete_data$display_activities <- f_get_athlete_week_data(
+        activities_detailed,
+        input$athlete_filter,
+        input$activity_range_filter
+      )
     }
   )
-
-
   # Activity Recording Tab ----
   set_names <- reactive(paste0("set", seq_len(input$ni_set_count)))
 

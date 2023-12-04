@@ -53,7 +53,9 @@ df_credentials <- RSQLite::dbReadTable(conn= con_SQLite, name = "credentials")
 
 
 # activity_data <- readr::read_tsv(base::paste(v_prepared_data_path,"Activities.tsv", sep=""), show_col_types = FALSE)
-activity_data <- readr::read_delim("https://raw.githubusercontent.com/benhoskings1/REPS/main/Activities.tsv", delim = "\t", show_col_types = FALSE)
+e = simpleError("No internet connection")
+activity_data  <- tryCatch(readr::read_delim("https://raw.githubusercontent.com/benhoskings1/REPS/main/Activities.tsv", delim = "\t", show_col_types = FALSE), error = function(e) e)
+# activity_data <- readr::read_delim("https://raw.githubusercontent.com/benhoskings1/REPS/main/Activities.tsv", delim = "\t", show_col_types = FALSE)
 member_data <- readr::read_tsv(base::paste(v_prepared_data_path,"Member_Data.tsv", sep=""), show_col_types = FALSE)
 activities_detailed <- readr::read_tsv(base::paste(v_prepared_data_path,"Activities_Detailed.tsv", sep=""), show_col_types = FALSE)
 

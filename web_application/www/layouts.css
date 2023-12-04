@@ -11,11 +11,12 @@
 
 .profile_overview {
   display: grid;
+  grid-area: profile_overview;
   grid-template-areas:
-    'profile_pic name'
-    'profile_pic activity_overview'
-    'age event';
-  grid-template-columns: 30% 70%;
+    'name name name'
+    'profile_pic activity_overview activity_overview'
+    'profile_pic age event';
+  grid-template-columns: 30% 35%;
   column-gap: 20px;
   row-gap: 5px
 }

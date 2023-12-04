@@ -82,8 +82,8 @@ ui <- shiny::fluidPage(
       ),
 
       shiny::tabPanel(
-        title = tags$div(class="tab_title", "Athlete Overview 2"),
-        value = "Athlete_Overview_2",
+        title = tags$div(class="tab_title", "Athlete Overview"),
+        value = "Athlete_Overview",
         shiny::wellPanel(
           style = "background: white;",
           tags$div(class="profile_layout",
@@ -114,102 +114,30 @@ ui <- shiny::fluidPage(
               )
             ),
             tags$div(class="data_container",
-              tags$div(class="profile_overview", style="width: 100%; height: 100%",
-                tags$div(class="grid_item", style="grid-area: profile_pic",
-                  shiny::uiOutput("im_profile_pic")
-                ),
-                tags$div(style="grid-area: activity_overview",
-                  tags$div("Weekly Summary"),
-                  shiny::uiOutput("activity_summary")
-                ),
-                tags$div(class="grid_title", style="grid-area: name; font-size: 24px;",
-                  shiny::htmlOutput("name_string")
-                ),
-                tags$div(class="grid_item", style="grid-area: age;", "Age: 21"),
-                tags$div(class="grid_item", style="grid-area: event;", "Event: 800m"),
+              tags$div(class="grid_item", style="height: 100%;",
+                tags$div(class="profile_overview", style="height: 100%",
+                  tags$div(class="grid_item", style="grid-area: profile_pic",
+                    shiny::uiOutput("im_profile_pic")
+                  ),
+                  tags$div(style="grid-area: activity_overview",
+                    tags$div("Weekly Summary"),
+                    shiny::uiOutput("activity_summary")
+                  ),
+                  tags$div(class="grid_title", style="grid-area: name; font-size: 24px;",
+                    shiny::htmlOutput("name_string")
+                  ),
+                  tags$div(class="grid_item", style="grid-area: age;", "Age: 21"),
+                  tags$div(class="grid_item", style="grid-area: event;", "Event: 800m"),
+                )
               )
+
             )
           ),
           tags$br(style="height: 50px"),
           tags$div(class="data_container",
-            shiny::uiOutput("athlete_activity_calendar")
-          )
-        )
-      ),
-
-
-      # Personal Tab -------
-      shiny::tabPanel(
-        title = tags$div(class="tab_title", "Athlete Overview"),
-        value = "Athlete_Overview",
-        shiny::wellPanel(
-          id = "WP_Personal",
-          style = "background: white",
-
-          shiny::sidebarLayout(
-            shiny::sidebarPanel(
-              width = 2,
-              shiny::selectInput(
-                inputId = "si_person_filter",
-                label = "Select Athelete",
-                choices = unique(activities_detailed$Athlete_ID)
-              ),
-              shiny::selectInput(
-                inputId = "si_day_filter",
-                label = "Select Day",
-                choices = c("Monday")
-              )
-            ),
-
-            shiny::mainPanel(
-              width = 10,
-              shiny::fluidRow(
-                width = 12,
-                ## Add profile section -------
-                tags$div(
-                  style="padding:15px;",
-                  class="profile_container",
-                  tags$div(
-                    class="profile_pic_container",
-                    tags$div(
-                      style="padding: 10px; display: flex;"
-                    )
-
-                  ),
-                  tags$div(
-                    class="activity_overview_container"
-                  )
-                )
-              ),
-              shiny::br(),
-              ## Show week highlights -----
-              shiny::fluidRow(
-                shiny::column(
-                  width = 12,
-                  tags$div(
-                    shiny::htmlOutput("activity_table")
-                  )
-                )
-              ),
-              shiny::br(),
-
-              shiny::fluidRow(
-                shiny::column(
-                  width = 12,
-                  DT::dataTableOutput("week_sessions")
-                )
-              ),
-              shiny::br(),
-
-              ## Show all strava activities for set day ----
-              shiny::fluidRow(
-                width = 12,
-                shiny::column(
-                  width = 12,
-                  DT::dataTableOutput("day_table")
-                )
-              )
-            )
+            shiny::uiOutput("athlete_activity_calendar"),
+            tags$br(style="height: 50px"),
+            shiny::uiOutput("day_calendar")
           )
         )
       ),
@@ -217,7 +145,6 @@ ui <- shiny::fluidPage(
       # Activity Input Tab -------
       shiny::tabPanel(
         title = tags$div(class="tab_title", "Record Activity"),
-
         shiny::wellPanel(
           id = "WP_Activity",
           style = "background: white;",

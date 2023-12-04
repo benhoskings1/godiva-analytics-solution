@@ -28,30 +28,6 @@ f_save_credentials <- function(data) {
 }
 
 # App functions --------
-f_pull_data <- function(data, day, cat) {
-  activities <- data |>
-    dplyr::filter(days_since == day)
-
-  value <- if(nrow(activities) != 0) {
-    activities |>
-      dplyr::filter(elapsed_time == max(elapsed_time)) |>
-      dplyr::filter(dplyr::row_number() == 1) |>
-      dplyr::pull(cat)
-  } else {
-    activities |>
-      dplyr::pull(cat)
-  }
-
-  if(length(value) != 0) {
-    switch(
-      cat,
-      "distance" = sprintf("%.2f km", value/1000),
-      "elapsed_time" = format(
-        lubridate::as_datetime(lubridate::seconds(value)),
-        "%H:%M:%S"),
-      value)
-  } else " "
-}
 
 f_get_athlete_week_data <- function(all_data, athlete_id, date_range) {
   week_data <- all_data |>
@@ -86,190 +62,67 @@ f_create_team_overview <- function(first_name, last_name, week, month) {
   )
 }
 
-f_create_activity_table <- function(week_data) {
+generate_calendar <- function(start_end, all_activities) {
+  date_range <- (lubridate::as_date(start_end[2]) - lubridate::as_date(start_end[1]))
+  first_monday <- lubridate::as_date(start_end[1]) - lubridate::wday(lubridate::as_date(start_end[1]), week_start=1)+1
+  next_sunday <- today+(7-lubridate::wday(today, week_start=1))
 
-  day_off <- "#a5c90f"; day_on <-"#D3D8DB";
-
-  days <- c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun")
-  icons <- c(as.character(icon("dumbbell", lib = "font-awesome")),
-  as.character(icon("stopwatch", lib = "font-awesome")),
-  as.character(icon("running", lib = "font-awesome")),
-  as.character(icon("stopwatch", lib = "font-awesome")),
-  as.character(icon("bed", lib = "font-awesome")),
-  as.character(icon("stopwatch", lib = "font-awesome")),
-  as.character(icon("running", lib = "font-awesome")))
-
-  icon_list <- c(
-    " " = "",
-    "Workout" = as.character(icon("dumbbell", lib = "font-awesome")),
-    "Training" = as.character(icon("stopwatch", lib = "font-awesome")),
-    "Run" = as.character(icon("running", lib = "font-awesome")),
-    "Stopwatch" = as.character(icon("stopwatch", lib = "font-awesome")),
-    "Rest" = as.character(icon("bed", lib = "font-awesome")),
-    "Ride" = as.character(icon("bicycle", lib = "font-awesome")),
-    "MountainBikeRide" = as.character(icon("bicycle", lib = "font-awesome")),
-    "Swim" = as.character(icon("person-swimming", lib = "font-awesome")),
-    "Hike" = as.character(icon("person-hiking", lib = "font-awesome")),
-    "Walk" = as.character(icon("person-walking", lib = "font-awesome")))
-
-  day_start <- lubridate::wday(Sys.time(), week_start = getOption("lubridate.week.start", 1))
-
-  active_days <- logical(7)
-  active_days[unique(7 - week_data$days_since)] <- T
-
-  htmlTable <- sprintf("
-      <style>
-      table {
-        border-spacing: 30px;
-        border-style: solid;
-        width: 100%%;
-      }
-
-      th, td {
-        text-align: center;
-        border-style: solid;
-      }
-
-      tr {
-        border-style: solid;
-      }
-
-      .type_container {
-        grid-area: type;
-        color: #3F3F3F; font-size: 12px;
-        display: flex; justify-content: center; align-items: center;}
-
-      .dist_container {
-        grid-area: dist;
-        color: #3F3F3F;
-        font-size: 12px;
-        display: flex; justify-content: center; align-items: center;}
-
-      .time_container {
-        grid-area: time;
-        color: #3F3F3F;
-        font-size: 12px;
-        display: flex; justify-content: center; align-items: center;}
-
-      .img_container {
-        grid-area: image;
-        font-size: 48px;
-        display: flex; justify-content: center; align-items: center;}
-
-      .activity_container {
-        display: grid;
-        grid-template-areas:
-          'image image type'
-          'image image dist'
-          'image image time';
-        gap: 10px;
-        padding: 5px 0px;
-      }
-      </style>
-
-      <body>
-        <table>
-          <tr>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-            <th style='border-style: solid;'>%s</th>
-          </tr>
-          <tr>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-            <td style='background-color:%s; border-style: solid;'>
-              <div class='activity_container'>
-                <div class='type_container'>%s</div>
-                <div class='dist_container'>%s</div>
-                <div class='time_container'>%s</div>
-                <div class='img_container'>%s</div>
-              </div>
-            </td>
-          </tr>
-        </table>
-      </body>
-      ",
-      days[((day_start) %% 7) + 1], days[((day_start+1) %% 7) + 1],
-      days[((day_start+2) %% 7) + 1], days[((day_start+3) %% 7) + 1],
-      days[((day_start+4) %% 7) + 1], days[((day_start+5) %% 7) + 1],
-      days[((day_start+6) %% 7) + 1],
-
-      if(active_days[1]) day_on else day_off,
-      f_pull_data(week_data, 6, "sport_type"),  f_pull_data(week_data, 6, "distance"),
-      f_pull_data(week_data, 6, "elapsed_time"), icon_list[f_pull_data(week_data, 6, "sport_type")],
-      if(active_days[2]) day_on else day_off,
-      f_pull_data(week_data, 5, "sport_type"), f_pull_data(week_data, 5, "distance"),
-      f_pull_data(week_data, 5, "elapsed_time"), icon_list[f_pull_data(week_data, 5, "sport_type")],
-      if(active_days[3]) day_on else day_off,
-      f_pull_data(week_data, 4, "sport_type"), f_pull_data(week_data, 4, "distance"),
-      f_pull_data(week_data, 4, "elapsed_time"), icon_list[f_pull_data(week_data, 4, "sport_type")],
-      if(active_days[4]) day_on else day_off,
-      f_pull_data(week_data, 3, "sport_type"), f_pull_data(week_data, 3, "distance"),
-      f_pull_data(week_data, 3, "elapsed_time"), icon_list[f_pull_data(week_data, 3, "sport_type")],
-      if(active_days[5]) day_on else day_off,
-      f_pull_data(week_data, 2, "sport_type"), f_pull_data(week_data, 2, "distance"),
-      f_pull_data(week_data, 2, "elapsed_time"), icon_list[f_pull_data(week_data, 2, "sport_type")],
-      if(active_days[6]) day_on else day_off,
-      f_pull_data(week_data, 1, "sport_type"), f_pull_data(week_data, 1, "distance"),
-      f_pull_data(week_data, 1, "elapsed_time"), icon_list[f_pull_data(week_data, 1, "sport_type")],
-      if(active_days[7]) day_on else day_off,
-      f_pull_data(week_data, 0, "sport_type"), f_pull_data(week_data, 0, "distance"),
-      f_pull_data(week_data, 0, "elapsed_time"), icon_list[f_pull_data(week_data, 0, "sport_type")])
-
-  return(htmlTable)
+  tags$table(class="calendar",
+    tags$tr(purrr::map(names(week_days), function(name)
+      tags$td(class = "cal_head", name)
+      )
+    ), {
+    rows <- base::ceiling((today - first_monday) / 7)
+    purrr::map(c(1:rows), function(row_idx) {
+      tags$tr(class = "calendar_row",
+      purrr::map(1:7, function(col_idx) {
+        cell_date <- (next_sunday - (rows - row_idx) * 7 - (7 - col_idx))
+        activities <- all_activities |>
+          dplyr::filter(lubridate::as_date(start_date) == cell_date)
+        bg_colour <-
+          if (!dplyr::between(cell_date, start_end[1], start_end[2])) {
+            "#a9a9a9"
+          } else if (nrow(activities) > 0) {
+            "rgba(0,255,0,0.3);"
+          } else {
+            "rgba(228,228,228,0.3);"
+          }
+        tags$td(
+          class = "calendar_cell",
+          style = sprintf("background-color: %s", bg_colour),
+          tags$div(class = "cal_date_num", {
+            if (lubridate::day(cell_date) == 1) {
+              format(cell_date, "%d-%b")
+            } else {
+              format(cell_date, "%d")
+            }
+          }),
+          if (nrow(activities) > 0) {
+            main <-activities |> dplyr::filter(elapsed_time == max(elapsed_time))
+            print(get_sport_icon(main$sport_type))
+            tags$div(
+              class = "activity_container",
+              tags$div(
+                class = "grid_item",
+                style = "grid-area: icon; font-size: 32px",
+                get_sport_icon(main$sport_type)
+              ),
+              tags$div(style = "grid-area: type;", main$sport_type),
+              tags$div(style = "grid-area: dist;", sprintf("%.2f km", main$distance /
+                                                             1000)),
+              tags$div(style = "grid-area: time;",
+                 format(
+                   lubridate::as_datetime(lubridate::seconds(main$elapsed_time)),
+                   "%H:%M:%S"
+                 )
+               ),
+            )
+          })
+        })
+      )
+    })
+  })
 }
-
-
 
 # shiny::appendTab(
 #   inputId = "NP_Info",
