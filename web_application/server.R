@@ -76,25 +76,17 @@ server <- function(input, output, session) {
   )
 
   output$athlete_activity_calendar <- shiny::renderUI({
-    start_end <- input$activity_range_filter
-    generate_calendar(start_end, athlete_data$display_activities)
+    generate_calendar(
+      input$activity_range_filter,
+      athlete_data$display_activities
+    )
   })
 
   output$day_calendar <-shiny::renderUI({
-    start_end <- input$activity_range_filter
-    day_idx <- base::as.numeric(input$activity_day_filter)
-    print(start_end[1])
-    selected_day <- names(week_days)[day_idx]
-    first_day <- lubridate::as_date(start_end[1]) +
-      (8 - lubridate::wday(lubridate::as_date(start_end[1]), week_start=1)) -
-      (day_idx)
-    print(first_day)
-
-    tags$table(class="calendar",
-      tags$tr(purrr::map(base::rep(selected_day, 4), function(name) {
-        cell_date <- first_day
-        tags$td(class = "cal_head", format(cell_date, "%A %d %b"))
-      }))
+    generate_calendar_2(
+      input$activity_range_filter,
+      input$activity_day_filter,
+      athlete_data$display_activities
     )
   })
 

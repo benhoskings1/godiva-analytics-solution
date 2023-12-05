@@ -83,3 +83,5 @@ week_days <- c("Monday"=1, "Tuesday"=2, "Wednesday"=3, "Thurdsay"=4,
                "Friday"=5, "Saturday"=6, "Sunday"=7)
 
 today <- base::Sys.Date()
+base_date <- lubridate::origin
+lubridate::hour(base_date) <- -1

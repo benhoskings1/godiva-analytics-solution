@@ -35,6 +35,31 @@
     'icon icon time';
 }
 
+.activity_grid_detailed {
+  display: grid;
+  grid-template-areas:
+    'title stats'
+    'description stats';
+}
+
+.detailed_activity_title {
+  font-size: 20px; font-weight: bold;
+  text-align: left;
+}
+
+.detailed_activity_stats {
+  grid-area: stats;
+  display: grid;
+  grid-template-areas:
+    'distance time pace';
+}
+
+.test_grid {
+  display: grid;
+  grid-template-areas:
+    'distance time pace';
+}
+
 .overview_table {
   align-content: center; table-layout: fixed;
   border: none; width: calc(100% - 20px);
@@ -72,4 +97,10 @@
 
 .cal_head {
   border: 2px solid black;
+}
+
+.small_text_1 {
+  text-align: left;
+  font-size: 12px;
+  color: #686868;
 }

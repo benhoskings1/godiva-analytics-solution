@@ -9,7 +9,8 @@ ui <- shiny::fluidPage(
 
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "app_style.css"),
-    tags$link(rel = "stylesheet", type = "text/css", href = "layouts.css")
+    tags$link(rel = "stylesheet", type = "text/css", href = "layouts.css"),
+    tags$script(src="https://strava-embeds.com/embed.js")
   ),
 
   waiter::useWaiter(),
@@ -98,13 +99,14 @@ ui <- shiny::fluidPage(
                   inputId = "activity_range_filter",
                   label = "Date range",
                   format = "dd-M",
-                  start = today - lubridate::days(7),
-                  end   = today,
+                  start = today - lubridate::days(20),
+                  end   = today, weekstart = 1
                 ),
                 shiny::selectInput(
                   inputId = "activity_day_filter",
                   label = "Day Filter",
-                  choices = c("None"=NA, week_days)
+                  choices = c("None"=NA, week_days),
+                  selected = 1
                 ),
                 shiny::selectInput(
                   inputId = "activity_type_filter",
@@ -138,6 +140,10 @@ ui <- shiny::fluidPage(
             shiny::uiOutput("athlete_activity_calendar"),
             tags$br(style="height: 50px"),
             shiny::uiOutput("day_calendar")
+          ),
+          tags$br(),
+          tags$div(class="data_container",
+            # HTML('<div class="strava-embed-placeholder" data-embed-type="activity" data-embed-id="10331455741"></div><script src="https://strava-embeds.com/embed.js"></script>')
           )
         )
       ),
