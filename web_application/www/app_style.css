@@ -102,3 +102,11 @@ well {
 .grid_item {
   display: flex; justify-content: center; align-items: center;
 }
+
+.day_title_large {
+  font-weight: bold; font-size: 24px; text-align: left;
+}
+
+.detailed_activity_title {
+  font-weight: bold; font-size: 18px;
+}

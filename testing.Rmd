@@ -1,0 +1,21 @@
+```{r}
+base_date <- lubridate::origin
+lubridate::hour(base_date) <- -1
+base::strftime(base_date+ lubridate::seconds(60), "%l")
+```
+
+```{r}
+activities_detailed[1, ]
+
+1:3
+```
+
+```{r}
+num_string <- "04"
+nchar(num_string)
+substr(num_string, nchar(num_string)-1, nchar(num_string))
+```
+
+```{r}
+activities_detailed$laps
+```

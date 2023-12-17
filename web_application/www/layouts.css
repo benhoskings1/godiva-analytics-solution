@@ -40,24 +40,27 @@
   grid-template-areas:
     'title stats'
     'description stats';
+  grid-template-columns: 50% 50%;
+}
+
+.stats_holder {
+  display: grid;
+  grid-template-areas:
+    'distance time pace';
+  place-items: center;
+}
+
+.vertical-center {
+  margin: 0;
+  position: relative;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
 .detailed_activity_title {
   font-size: 20px; font-weight: bold;
   text-align: left;
-}
-
-.detailed_activity_stats {
-  grid-area: stats;
-  display: grid;
-  grid-template-areas:
-    'distance time pace';
-}
-
-.test_grid {
-  display: grid;
-  grid-template-areas:
-    'distance time pace';
 }
 
 .overview_table {
@@ -90,9 +93,7 @@
 }
 
 .cal_date_num {
-  text-align: right;
-  font-size: 10px;
-  color: #3F3F3F;
+  text-align: right; font-size: 10px; color: #3F3F3F;
 }
 
 .cal_head {
@@ -100,7 +101,5 @@
 }
 
 .small_text_1 {
-  text-align: left;
-  font-size: 12px;
-  color: #686868;
+  text-align: left; font-size: 12px; color: #adadad;
 }

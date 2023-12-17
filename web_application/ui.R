@@ -36,7 +36,7 @@ ui <- shiny::fluidPage(
           style = "background: #FFFFFF",
 
           tags$div(class="data_container",
-            tags$div(class="grid_title", "Team Overview")
+                   tags$div(class="grid_title", "Team Overview")
           ),
           tags$br(style="height: 50px"),
 
@@ -51,27 +51,26 @@ ui <- shiny::fluidPage(
                     if (((row_idx-1)*4 + col_idx) <= base::nrow((member_data))) {
                       member_id <- member_data$ID[(row_idx-1)*4 + col_idx]
                       tags$td(class="team_data",
-                        f_create_team_overview(
-                          member_data |>
-                            dplyr::filter(ID == member_id) |>
-                            dplyr::pull(First_Name),
-                          member_data |>
-                            dplyr::filter(ID == member_id) |>
-                            dplyr::pull(Last_Name),
-                          activities_detailed |>
-                            dplyr::filter(Athlete_ID == member_id) |>
-                            dplyr::filter(start_date > Sys.Date() - lubridate::days(6)) |>
-                            dplyr::filter(sport_type == "Run") |>
-                            dplyr::pull(distance) |>
-                            sum() / 1000,
-                          activities_detailed |>
-                            dplyr::filter(Athlete_ID == member_id) |>
-                            dplyr::filter(start_date > Sys.Date() - lubridate::days(30)) |>
-                            dplyr::filter(sport_type == "Run") |>
-                            dplyr::pull(distance) |>
-                            sum() / 1000
-                        )
-                      )
+                    f_create_team_overview(
+                      member_data |>
+                        dplyr::filter(ID == member_id) |>
+                        dplyr::pull(First_Name),
+                      member_data |>
+                        dplyr::filter(ID == member_id) |>
+                        dplyr::pull(Last_Name),
+                      activities_detailed |>
+                        dplyr::filter(Athlete_ID == member_id) |>
+                        dplyr::filter(start_date > Sys.Date() - lubridate::days(6)) |>
+                        dplyr::filter(sport_type == "Run") |>
+                        dplyr::pull(distance) |>
+                        sum() / 1000,
+                      activities_detailed |>
+                        dplyr::filter(Athlete_ID == member_id) |>
+                        dplyr::filter(start_date > Sys.Date() - lubridate::days(30)) |>
+                        dplyr::filter(sport_type == "Run") |>
+                        dplyr::pull(distance) |>
+                        sum() / 1000
+                      ))
                     }
                   })
                 )
@@ -91,27 +90,26 @@ ui <- shiny::fluidPage(
             tags$div(class="data_container",
               tags$div(style="grid-area: sidebar",
                 shiny::selectInput(
-                  inputId = "athlete_filter",
-                  label = "Select Athelete",
-                  choices = unique(activities_detailed$Athlete_ID)
+                 inputId = "athlete_filter",
+                 label = "Select Athelete",
+                 choices = unique(activities_detailed$Athlete_ID)
                 ),
                 shiny::dateRangeInput(
-                  inputId = "activity_range_filter",
-                  label = "Date range",
-                  format = "dd-M",
-                  start = today - lubridate::days(20),
-                  end   = today, weekstart = 1
+                 inputId = "activity_range_filter",
+                 label = "Date range",
+                 format = "dd-M",
+                 start = today - lubridate::days(20),
+                 end   = today, weekstart = 1
                 ),
                 shiny::selectInput(
-                  inputId = "activity_day_filter",
-                  label = "Day Filter",
-                  choices = c("None"=NA, week_days),
-                  selected = 1
+                 inputId = "activity_day_filter",
+                 label = "Day Filter",
+                 choices = c("None"=NA, week_days)
                 ),
                 shiny::selectInput(
-                  inputId = "activity_type_filter",
-                  label = "Activity Type",
-                  choices = c("None"=NA, "Run")
+                 inputId = "activity_type_filter",
+                 label = "Activity Type",
+                 choices = c("None"=NA, "Run")
                 )
               )
             ),
@@ -138,12 +136,7 @@ ui <- shiny::fluidPage(
           tags$br(style="height: 50px"),
           tags$div(class="data_container",
             shiny::uiOutput("athlete_activity_calendar"),
-            tags$br(style="height: 50px"),
             shiny::uiOutput("day_calendar")
-          ),
-          tags$br(),
-          tags$div(class="data_container",
-            # HTML('<div class="strava-embed-placeholder" data-embed-type="activity" data-embed-id="10331455741"></div><script src="https://strava-embeds.com/embed.js"></script>')
           )
         )
       ),
@@ -396,3 +389,4 @@ ui <- shiny::fluidPage(
 # }
 # }
 # )
+

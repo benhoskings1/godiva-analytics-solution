@@ -59,6 +59,12 @@ activity_data  <- tryCatch(readr::read_delim("https://raw.githubusercontent.com/
 member_data <- readr::read_tsv(base::paste(v_prepared_data_path,"Member_Data.tsv", sep=""), show_col_types = FALSE)
 activities_detailed <- readr::read_tsv(base::paste(v_prepared_data_path,"Activities_Detailed.tsv", sep=""), show_col_types = FALSE)
 
+activities_detailed <- activities_detailed |>
+  dplyr::mutate(distance_m = distance,
+                distance_yd = distance_m * 1.0936132983,
+                distance_km = distance / 1000,
+                distance_miles = distance_km * 0.6213711922)
+
 if (base::file.exists(base::paste(v_prepared_data_path, "session_data.tsv", sep=""))) {
   session_record_all <- readr::read_tsv(
     base::paste(v_prepared_data_path, "session_data.tsv", sep=""),

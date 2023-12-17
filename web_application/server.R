@@ -3,6 +3,11 @@ base::source(v_global_session_path)
 server <- function(input, output, session) {
   waiter::waiter_hide()
 
+  app_settings <- shiny::reactiveValues(
+    units = c("Run"="imperial", "Swim"="metric"),
+    vals = ""
+  )
+
   # New Tab -----
   ## Define reactive values ------
   rv_personal_tab <- shiny::reactiveValues(
@@ -60,7 +65,6 @@ server <- function(input, output, session) {
         )
       )
     )
-
   )
 
   output$im_profile_pic <- shiny::renderUI({
@@ -78,16 +82,25 @@ server <- function(input, output, session) {
   output$athlete_activity_calendar <- shiny::renderUI({
     generate_calendar(
       input$activity_range_filter,
-      athlete_data$display_activities
+      athlete_data$display_activities,
+      app_settings$units
     )
   })
 
   output$day_calendar <-shiny::renderUI({
-    generate_calendar_2(
-      input$activity_range_filter,
-      input$activity_day_filter,
-      athlete_data$display_activities
-    )
+    selected_day <- names(week_days)[base::as.numeric(input$activity_day_filter)]
+
+    if (!is.na(selected_day)) {
+      tags$div(
+        tags$br(style="height: 50px"),
+        generate_calendar_2(
+          input$activity_range_filter,
+          input$activity_day_filter,
+          athlete_data$display_activities,
+          app_settings$units
+        )
+      )
+    }
   })
 
   output$activity_table <- renderText(HTML(f_create_activity_table(athlete_data$display_activities)))
