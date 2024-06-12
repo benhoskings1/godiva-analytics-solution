@@ -81,11 +81,11 @@ analytics:
 
 # Site Author
 author:
-  name             : "Ben Hoskings"
-  avatar           : "ProfilePic.png"
-  bio              : "4th Year Systems Engineer"
-  location         : "Leamington Spa"
-  employer         : "University of Warwick"
+  name             : "Coventry Godiva Harriers"
+  avatar           : "Coventry_Logo.png"
+  # bio              : "4th Year Systems Engineer"
+  location         : "Coventry"
+  # employer         : "University of Warwick"
   pubmed           : # "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
   googlescholar    : # "http://yourfullgooglescholarurl.com"
   email            : "benjaminhoskings@gmail.com"
