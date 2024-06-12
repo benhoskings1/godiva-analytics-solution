@@ -8,13 +8,13 @@
 # Site Settings
 
 locale                   : "en-GB"
-title                    : "Ben Hoskings / Homepage"
+title                    : "Godiva Analytics Hub"
 title_separator          : "-"
-name                     : &name "Ben Hoskings Website"
-description              : &description "Ben Hoskings personal website"
-url                      : https://benhoskings1.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+name                     : &name "Godiva Analytics Hub"
+description              : &description "Support site for godiva data analytics"
+url                      : https://benhoskings1.github.io # the base hostname & protocol for your site e.g.
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "/benhoskings1.github.io"
+repository               : "/godiva-analytics-solution"
 teaser                   :  # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 breadcrumbs              : false # true, false (default)
 words_per_minute         : 160
