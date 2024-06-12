@@ -3,68 +3,150 @@ base::source(v_global_session_path)
 server <- function(input, output, session) {
   waiter::waiter_hide()
 
+  # authentication window -----------
+  auth <- shiny::callModule(
+    module = auth_server,
+    id = "auth",
+    check_credentials = shinymanager::check_credentials(df_credentials))
+
+  shiny::observe({
+   user_data <<- shiny::reactiveValuesToList(auth)$user_info
+   print(user_data)
+   if (!is.null(user_data)) {
+     if (!is.na(user_data$permissions)) {
+       athlete_data = athlete_db$find(sprintf('{"group": "%s"}', user_data$permissions))
+       athlete_data <- athlete_data |>
+         dplyr::mutate(full_name = paste(first_name, last_name, sep = " "))
+       athlete_id_map <- athlete_data$strava_id
+       names(athlete_id_map) <- athlete_data$full_name
+         updateSelectInput(
+         inputId = "athlete_filter",
+         label = "Select Athelete",
+         choices = athlete_id_map
+       )
+     }
+   }
+  })
+
   app_settings <- shiny::reactiveValues(
-    units = c("Run"="imperial", "Swim"="metric"),
+    units = list("Run"="imperial", "Swim"="metric", "Ride"="imperial"),
     vals = ""
   )
 
-  # New Tab -----
-  ## Define reactive values ------
-  rv_personal_tab <- shiny::reactiveValues(
-    week_data = f_get_athlete_week_data(activities_detailed, "38807221", c(today, today - lubridate::days(6)))
-    # week_sessions =
+  reactive_vals <- shiny::reactiveValues(
+    date_range = c(today -lubridate::weeks(10), today),
+    athlete_activities = NULL,
+    activity_overviews = NULL,
+    selected_consult = NULL,
+    name_string = "", age_string = "",
+
+    graph_option_table = NULL,
+    graph_options = list(),
+    graph_option_table = NULL
   )
 
-  athlete_data <- shiny::reactiveValues(
-    week_activities = f_get_athlete_week_data(activities_detailed, "38807221", c(today, today - lubridate::days(6))),
-    display_activities = f_get_athlete_week_data(activities_detailed, "38807221", c(today, today - lubridate::days(6))),
-    name_string = "", age_string = ""
+  graph_option_table <- reactive({
+    tags$table(style="width: 100%",
+      tags$tr(style="padding: 10px", {
+        sport_types <- unique(reactive_vals$activity_overviews$sport_type)
+        purrr::map(sport_types, function(sport_type) {
+          tags$td(style="text-align: left; vertical-align: text-top; padding: 10px",
+            tags$h3(sport_type, style="text-align: center"),
+
+            shiny::checkboxGroupInput(
+              inputId = glue("{stringr::str_to_lower(sport_type)}_graph_options"),
+              choices=activity_graph_options[[sport_type]],
+              selected = {
+                # prev_selected <- input[[paste(stringr::str_to_lower(sport_type), "_graph_options")]]
+
+                prev_selected <- reactive_vals$graph_options[[stringr::str_to_lower(sport_type)]]
+
+                if (!is.null(prev_selected)) {
+                  print("setting")
+                  reactive_vals$graph_options[[stringr::str_to_lower(sport_type)]]
+                } else {NULL}
+              },
+              label = NULL # Label is handled above
+            )
+          )
+        })
+      })
+    )
+  })
+
+  ## Define observe events -----
+  shiny::observeEvent(
+    eventExpr = input$athlete_filter,
+    handlerExpr = {
+
+      db_query = consults_db$find(sprintf('{"athlete_id":%s}', input$athlete_filter))
+      reactive_vals$athlete_activities = map_db_to_list(db_query)
+
+      reactive_vals$activity_overviews <- generate_activity_overview(reactive_vals$athlete_activities)
+
+      first_name <- athlete_data |>
+        dplyr::filter(strava_id == input$athlete_filter) |>
+        dplyr::pull(first_name)
+      last_name <- athlete_data |>
+        dplyr::filter(strava_id == input$athlete_filter) |>
+        dplyr::pull(last_name)
+
+      reactive_vals$name_string <- sprintf("<b>%s %s</b>", first_name, last_name)
+      reactive_vals$age_string <- "<b>Age: </b>"
+
+      reactive_vals$graph_options_table <- construct_graph_option_table(reactive_vals$activity_overviews)
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$activity_range_filter,
+    handlerExpr = {
+      # athlete_data$display_activities <- f_get_athlete_week_data(
+      #   activities_detailed,
+      #   input$athlete_filter,
+      #   input$activity_range_filter
+      # )
+    }
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$run_graph_options,
+    handlerExpr = {
+      reactive_vals$graph_options$run <- input$run_graph_options
+    }
+  )
+
+  ### Display Settings tab --------------
+  shiny::observeEvent(
+    eventExpr = input$run_unit_input,
+    handlerExpr = {app_settings$units$Run <- input$run_unit_input}
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$ride_unit_input,
+    handlerExpr = {app_settings$units$Ride <- input$ride_unit_input}
+  )
+
+  shiny::observeEvent(
+    eventExpr = input$swim_unit_input,
+    handlerExpr = {
+      if (input$swim_unit_input == "Miles") {
+        app_settings$units$Swim <- "imperial"
+      } else {
+        app_settings$units$Swim <- "metric"
+      }
+    }
   )
 
   ## Define reactive outputs ------
-  output$activity_summary <- shiny::renderUI(
-    tags$table(class="overview_table",
-      tags$tr(
-        tags$td(class="overview_data",
-          tags$div(class="activity_container", style="gap: 10px",
-            tags$div(style="grid-area: type", "Activities"),
-            tags$div(style="grid-area: dist", base::nrow(athlete_data$week_activities)
-            ),
-            tags$div(style="grid-area: time", {
-              total_time <- athlete_data$week_activities |>
-                dplyr::pull(elapsed_time) |>
-                base::sum()
-              format(lubridate::as_datetime(
-                lubridate::seconds(total_time)), "%H:%M:%S"
-              )
-            }),
-            tags$div(style="grid-area: icon; font-size: 50px", get_sport_icon("Workout")
-            )
-          )
-        ),
-        tags$td(class="overview_data",
-          tags$div(class="activity_container", style="gap: 10px",
-            tags$div(style="grid-area: type", "Runs"),
-            tags$div(style="grid-area: dist", base::nrow(
-              athlete_data$week_activities |>
-                dplyr::filter(sport_type == "Run")
-              )
-            ),
-            tags$div(style="grid-area: time", {
-              total_time <- athlete_data$week_activities |>
-                dplyr::filter(sport_type == "Run") |>
-                dplyr::pull(elapsed_time) |>
-                base::sum()
-              format(lubridate::as_datetime(
-                lubridate::seconds(total_time)), "%H:%M:%S"
-              )
-            }),
-            tags$div(style="grid-area: icon; font-size: 50px", get_sport_icon("Run")
-            )
-          )
-        )
-      )
-    )
+  output$activity_summary <- shiny::renderUI({
+    week_activities <- reactive_vals$activity_overviews |>
+      dplyr::filter(dplyr::between(start_date, today- lubridate::days(7), today))
+
+    # print(week_activities)
+
+    construct_week_overview(week_activities)
+    }
   )
 
   output$im_profile_pic <- shiny::renderUI({
@@ -82,7 +164,7 @@ server <- function(input, output, session) {
   output$athlete_activity_calendar <- shiny::renderUI({
     generate_calendar(
       input$activity_range_filter,
-      athlete_data$display_activities,
+      reactive_vals$activity_overviews,
       app_settings$units
     )
   })
@@ -91,60 +173,31 @@ server <- function(input, output, session) {
     selected_day <- names(week_days)[base::as.numeric(input$activity_day_filter)]
 
     if (!is.na(selected_day)) {
+      print(input$run_graph_options)
+
       tags$div(
+        tags$br(style="height: 50px"),
+        tags$div(
+          graph_option_table()
+        ),
         tags$br(style="height: 50px"),
         generate_calendar_2(
           input$activity_range_filter,
           input$activity_day_filter,
-          athlete_data$display_activities,
+          reactive_vals$athlete_activities,
+          reactive_vals$activity_overviews,
+          reactive_vals$graph_options,
           app_settings$units
         )
       )
     }
   })
 
-  output$activity_table <- renderText(HTML(f_create_activity_table(athlete_data$display_activities)))
-  output$name_string <- shiny::renderText(athlete_data$name_string)
-  output$age_string <- shiny::renderText(athlete_data$age_string)
+  output$activity_table <- renderText(HTML(f_create_activity_table(reactive_vals$athlete_activities)))
+  output$name_string <- shiny::renderText(reactive_vals$name_string)
+  output$age_string <- shiny::renderText(reactive_vals$age_string)
 
-  ## Define observe events -----
-  shiny::observeEvent(
-    eventExpr = input$athlete_filter,
-    handlerExpr = {
-      athlete_data$week_activities <- f_get_athlete_week_data(
-        activities_detailed,
-        input$athlete_filter,
-        c(today - lubridate::days(6), today)
-      )
 
-      athlete_data$display_activities <- f_get_athlete_week_data(
-        activities_detailed,
-        input$athlete_filter,
-        input$activity_range_filter
-      )
-
-      first_name <- member_data |>
-        dplyr::filter(ID == input$athlete_filter) |>
-        dplyr::pull(First_Name)
-      last_name <- member_data |>
-        dplyr::filter(ID == input$athlete_filter) |>
-        dplyr::pull(Last_Name)
-
-      athlete_data$name_string <- sprintf("<b>%s %s</b>", first_name, last_name)
-      athlete_data$age_string <- "<b>Age: </b>"
-    }
-  )
-
-  shiny::observeEvent(
-    eventExpr = input$activity_range_filter,
-    handlerExpr = {
-      athlete_data$display_activities <- f_get_athlete_week_data(
-        activities_detailed,
-        input$athlete_filter,
-        input$activity_range_filter
-      )
-    }
-  )
   # Activity Recording Tab ----
   set_names <- reactive(paste0("set", seq_len(input$ni_set_count)))
 
@@ -188,10 +241,10 @@ server <- function(input, output, session) {
     purrr::map(0:10, function(num) {
       shiny::observeEvent(
         input[[sprintf("ab_scale_%d", num)]], {
-          shiny::updateActionButton(
-            sprintf("ab_scale_%d", num),
-            style="background-color: #FF0000"
-          )
+          # shiny::updateActionButton(session,
+          #   sprintf("ab_scale_%d", num),
+          #   style="background-color: #FF0000"
+          # )
           output$activity_rating <- shiny::renderText(num)
         }
       )

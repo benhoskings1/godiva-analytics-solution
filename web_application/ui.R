@@ -19,6 +19,29 @@ ui <- shiny::fluidPage(
     color = v_main_colour
   ),
 
+  # Auth screen ------
+  # shinymanager::auth_ui(
+  #
+  #   id = "auth",
+  #   tags_top = tags$div(
+  #     tags$h4("Coventry Godiva Athelete Portal", style="align:center"),
+  #     tags$img(
+  #       src = "Logo.png",
+  #       width = 100
+  #     )
+  #   ),
+  #   tags_botton = tags$div(
+  #     tags$p(
+  #       "For any questions, please contact ",
+  #       tags$a(
+  #         href = "mailto:benjaminhoskings@gmail.com",
+  #         target = "_top", "administator"
+  #       )
+  #     )
+  #   ),
+  #   choose_language = F
+  # ),
+
   shinydisconnect::disconnectMessage(
     text = "The app stopped working??"
   ),
@@ -28,8 +51,10 @@ ui <- shiny::fluidPage(
       title = "",
       width = 12,
       id = "TabBox01",
+      selected = "athlete_tab",
 
       shiny::tabPanel(
+        value = "team_tab",
         title = tags$div(class="tab_title", "Team Overview"),
         shiny::wellPanel(
           id = "WP_Team_Overview",
@@ -41,49 +66,49 @@ ui <- shiny::fluidPage(
           tags$br(style="height: 50px"),
 
           ## Team Table ------
-          tags$div(class="data_container",
-            tags$div(class="grid_title", "Team Summary"),
-            tags$table(class="team_table", {
-              rows <- base::ceiling(base::nrow(member_data) / 4)
-              purrr::map(c(1:rows), function(row_idx) {
-                tags$tr(class="team_row",
-                  purrr::map(1:4, function(col_idx) {
-                    if (((row_idx-1)*4 + col_idx) <= base::nrow((member_data))) {
-                      member_id <- member_data$ID[(row_idx-1)*4 + col_idx]
-                      tags$td(class="team_data",
-                    f_create_team_overview(
-                      member_data |>
-                        dplyr::filter(ID == member_id) |>
-                        dplyr::pull(First_Name),
-                      member_data |>
-                        dplyr::filter(ID == member_id) |>
-                        dplyr::pull(Last_Name),
-                      activities_detailed |>
-                        dplyr::filter(Athlete_ID == member_id) |>
-                        dplyr::filter(start_date > Sys.Date() - lubridate::days(6)) |>
-                        dplyr::filter(sport_type == "Run") |>
-                        dplyr::pull(distance) |>
-                        sum() / 1000,
-                      activities_detailed |>
-                        dplyr::filter(Athlete_ID == member_id) |>
-                        dplyr::filter(start_date > Sys.Date() - lubridate::days(30)) |>
-                        dplyr::filter(sport_type == "Run") |>
-                        dplyr::pull(distance) |>
-                        sum() / 1000
-                      ))
-                    }
-                  })
-                )
-              })}
-            )
-          )
+          # tags$div(class="data_container",
+          #   tags$div(class="grid_title", "Team Summary"),
+          #   tags$table(class="team_table", {
+          #     rows <- base::ceiling(base::nrow(member_data) / 4)
+          #     purrr::map(c(1:rows), function(row_idx) {
+          #       tags$tr(class="team_row",
+          #         purrr::map(1:4, function(col_idx) {
+          #           if (((row_idx-1)*4 + col_idx) <= base::nrow((member_data))) {
+          #             member_id <- member_data$ID[(row_idx-1)*4 + col_idx]
+          #             tags$td(class="team_data",
+          #           f_create_team_overview(
+          #             member_data |>
+          #               dplyr::filter(ID == member_id) |>
+          #               dplyr::pull(First_Name),
+          #             member_data |>
+          #               dplyr::filter(ID == member_id) |>
+          #               dplyr::pull(Last_Name),
+          #             activities_detailed |>
+          #               dplyr::filter(Athlete_ID == member_id) |>
+          #               dplyr::filter(start_date > Sys.Date() - lubridate::days(6)) |>
+          #               dplyr::filter(sport_type == "Run") |>
+          #               dplyr::pull(distance) |>
+          #               sum() / 1000,
+          #             activities_detailed |>
+          #               dplyr::filter(Athlete_ID == member_id) |>
+          #               dplyr::filter(start_date > Sys.Date() - lubridate::days(30)) |>
+          #               dplyr::filter(sport_type == "Run") |>
+          #               dplyr::pull(distance) |>
+          #               sum() / 1000
+          #             ))
+          #           }
+          #         })
+          #       )
+          #     })}
+          #   )
+          # )
           # create a 4xY grid of athlete info
         )
       ),
 
       shiny::tabPanel(
+        value = "athlete_tab",
         title = tags$div(class="tab_title", "Athlete Overview"),
-        value = "Athlete_Overview",
         shiny::wellPanel(
           style = "background: white;",
           tags$div(class="profile_layout",
@@ -92,7 +117,7 @@ ui <- shiny::fluidPage(
                 shiny::selectInput(
                  inputId = "athlete_filter",
                  label = "Select Athelete",
-                 choices = unique(activities_detailed$Athlete_ID)
+                 choices = athlete_id_map
                 ),
                 shiny::dateRangeInput(
                  inputId = "activity_range_filter",
@@ -104,7 +129,7 @@ ui <- shiny::fluidPage(
                 shiny::selectInput(
                  inputId = "activity_day_filter",
                  label = "Day Filter",
-                 choices = c("None"=NA, week_days)
+                 choices = c("All"=NA, week_days)
                 ),
                 shiny::selectInput(
                  inputId = "activity_type_filter",
@@ -235,6 +260,40 @@ ui <- shiny::fluidPage(
             )
           ),
           shiny::textOutput("activity_rating")
+        )
+      ),
+
+      shiny::tabPanel(
+        title = tags$div(class="tab_title", "Settings"),
+        shiny::wellPanel(
+          id = "WP_Settings",
+          style = "background: white;",
+
+          tags$div(class="row", style="display: flex; padding: 20px;",
+            tags$div(class="column", style="flex: 45%;",
+              shinyWidgets::radioGroupButtons(
+                inputId = "run_unit_input",
+                label = "Run",
+                choices = list("Miles"="imperial", "Kilometers"="metric"),
+                justified = TRUE
+              ),
+              shinyWidgets::radioGroupButtons(
+                inputId = "swim_unit_input",
+                label = "Swim",
+                choices = c("100yd", "100m"),
+                justified = TRUE
+              )
+            ),
+            tags$div(class="column", style="flex: 10%;"),
+            tags$div(class="column", style="flex: 45%;",
+              shinyWidgets::radioGroupButtons(
+                inputId = "ride_unit_input",
+                label = "Ride",
+                choices = list("Miles"="imperial", "Kilometers"="metric"),
+                justified = TRUE
+              )
+            )
+          )
         )
       )
     )
