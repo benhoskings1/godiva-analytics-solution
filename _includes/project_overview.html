@@ -1,0 +1,118 @@
+{% include base_path %}
+
+{% if post.header.teaser %}
+  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% else %}
+  {% assign teaser = site.teaser %}
+{% endif %}
+
+{% if post.id %}
+  {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
+{% else %}
+  {% assign title = post.title %}
+{% endif %}
+
+<style>
+/* Title formatting */
+.item1 { grid-area: title; padding: 10px; border-radius: 15px;
+         background-color: #D3D8DB; color: #3F3F3F;
+         font-weight: bold; font-size: 22px;
+         display: flex; align-items: center;}
+
+.info_container {grid-area: info; padding: 10px;;
+                 color: #3F3F3F; 
+                 font-size: 18px; 
+                 display: flex; justify-content: center; align-items: center;}
+
+.link_container {grid-area: hyperlinks; padding: 10px;;
+                 color: #3F3F3F; 
+                 font-size: 18px; 
+                 display: flex; justify-content: center; align-items: center;} 
+
+/* Language formatting */
+
+.item4 { grid-area: description; padding: 10px 30px;
+        color: #3F3F3F;}
+
+.item5 { grid-area: explore_proj; padding: 10px;
+         color: #3F3F3F;
+         display: flex; justify-content: center; align-items: center;}
+
+.item6 { grid-area: explore_code; padding: 10px;
+         color: #3F3F3F;
+         display: flex; justify-content: center; align-items: center;}
+
+.item7 { grid-area: image; display: flex; justify-content: center; align-items: center;}
+
+.grid-container-default {
+  display: grid;
+  grid-template-areas:
+    'title title'
+    'info info'
+    'description description'
+    'hyperlinks hyperlinks';
+  gap: 10px;
+  background-color: #FFFFFF;
+  padding: 10px 0px;
+}
+
+.grid-container-image {
+  display: grid;
+  grid-template-areas:
+    'title title title'
+    'info info image'
+    'description description image'
+    'hyperlinks hyperlinks image';
+  gap: 10px;
+  background-color: #FFFFFF;
+  padding: 10px 0px;
+}
+</style>
+
+<body>
+<div class="grid-container-{{post.container | default: 'default'}}">
+  <div class="item1">
+    {{ post.title }}
+  </div>
+  <div class="info_container">
+    {% if post.languages %}
+    <div class="column" style="width: 50%; font-style: italic;font-weight: normal;
+                               display: flex; justify-content: center; align-items: center;"> 
+      {{post.languages}}
+    </div>
+    {% endif %}
+    {% if post.dates %}
+      <div class="column" style="width: 50%; display: flex; justify-content: center; align-items: center;">
+        {{post.dates}}
+      </div>  
+    {% endif %}
+  </div>
+
+  <div class="item4">
+    {{ post.overview }}
+  </div>
+
+  <div class="link_container">
+    {% if post.permalink %}
+    <div class="column" style="width: 50%; display: flex; justify-content: center; align-items: center;"> 
+      <a href="{{ base_path }}{{ post.url }}" rel="permalink">
+        Explore the project
+      </a>
+    </div>
+    {% endif %}
+    {% if post.git_link %}
+      <div class="column" style="width: 50%; display: flex; justify-content: center; align-items: center;">
+        <a href="{{post.git_link}}">
+          Explore the code
+        </a>
+      </div>  
+    {% endif %}
+  </div>
+
+  {% if post.container == "image" && post.cover_image %}
+    <div class="item7">
+      <img src="/images/{{post.cover_image}}" alt="cover_image" style="max-height: 250px;"/>
+    </div>
+  {% endif %}
+</div>
+</body>
