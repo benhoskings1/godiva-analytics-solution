@@ -12,7 +12,7 @@ title                    : "Godiva Analytics Hub"
 title_separator          : "-"
 name                     : &name "Godiva Analytics Hub"
 description              : &description "Support site for godiva data analytics"
-url                      : https://benhoskings1.github.io # the base hostname & protocol for your site e.g.
+url                      : https://benhoskings1.github.io/godiva-analytics-solution # the base hostname & protocol for your site e.g.
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "/godiva-analytics-solution"
 teaser                   :  # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
