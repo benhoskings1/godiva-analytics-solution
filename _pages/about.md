@@ -4,7 +4,7 @@ title: "About the App"
 excerpt: "About the App"
 author_profile: true
 redirect_from: 
-  - /about/
+  - /godiva-analytics-solution/
   - /about.html
 ---
 
