@@ -51,8 +51,10 @@ ui <- shiny::fluidPage(
       title = "",
       width = 12,
       id = "TabBox01",
-      selected = "athlete_tab",
+      ### Change to set default tab -------
+      # selected = "athlete_tab",
 
+      # Team Overview Tab ---------
       shiny::tabPanel(
         value = "team_tab",
         title = tags$div(class="tab_title", "Team Overview"),
@@ -65,7 +67,11 @@ ui <- shiny::fluidPage(
           ),
           tags$br(style="height: 50px"),
 
-          ## Team Table ------
+          ## Team Table -----
+          tags$div(class="data_container",
+            shiny::uiOutput("team_table")
+          ),
+
           # tags$div(class="data_container",
           #   tags$div(class="grid_title", "Team Summary"),
           #   tags$table(class="team_table", {
@@ -106,6 +112,7 @@ ui <- shiny::fluidPage(
         )
       ),
 
+      # Athlete Tab ---------
       shiny::tabPanel(
         value = "athlete_tab",
         title = tags$div(class="tab_title", "Athlete Overview"),
@@ -406,6 +413,7 @@ ui <- shiny::fluidPage(
 #   )
 # )
 #
+
 # ## Add button to set as default ----
 # output$session_buttons <- shiny::renderUI(
 #   shiny::fluidRow(

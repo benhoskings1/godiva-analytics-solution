@@ -27,6 +27,15 @@ library(glue)
 Sys.setenv(VROOM_CONNECTION_SIZE=5000072)
 
 # Define app colours -------
+app_colours <- list(
+  "v_main_colour"="#0B3861",
+  "deep_blue"="#274251",
+  "ice_blue"="#89A7AD",
+  "light_blue"="#E6F1F7",
+  "grey_blue"="#778899"
+)
+
+
 v_main_colour <- "#0B3861"
 deep_blue <-  "#274251"
 ice_blue <- "#89A7AD"
@@ -60,6 +69,7 @@ athlete_db = mongo(collection="athlete_data", db="godiva_data", url=connection_s
 athlete_data = athlete_db$find()
 athlete_data <- athlete_data |>
   dplyr::mutate(full_name = paste(first_name, last_name, sep = " "))
+
 athlete_id_map <- athlete_data$strava_id
 names(athlete_id_map) <- athlete_data$full_name
 

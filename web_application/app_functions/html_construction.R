@@ -1,4 +1,62 @@
-# HTML ELEMENTS
+# HTML ELEMENTS -------
+## Team Overview Tab -------
+construct_team_table <- function(athlete_data, all_activities) {
+  tags$table(class="team_table",
+    tags$tr(class="team_row",
+      tags$th(style="text-align: left; padding: 0.5em", "Athlete"),
+      purrr::map(1:14, function(day_idx) {
+        tags$th(style="padding: 0.5em; width: 2em;",
+          substr(
+            format(lubridate::today() - lubridate::days(day_idx), "%A"), 1, 1
+          )
+        )
+      })
+    ),
+    purrr::map(1:nrow(athlete_data), function(athlete_idx) {
+      strava_id = athlete_data |>
+        dplyr::slice(athlete_idx) |>
+        dplyr::pull(strava_id)
+
+
+      tags$tr(style={
+          if(athlete_idx %% 2) {
+            "background-color: #dcdcdc; padding: 0.5em"
+          } else {
+            "padding: 0.5em"
+          }
+        },
+        tags$td(style="text-align: left; background-color: inherit; padding: 0.5em",
+          athlete_data |>
+            dplyr::slice(athlete_idx) |>
+            dplyr::pull(full_name)
+        ),
+        purrr::map(1:14, function(day_idx) {
+          date_string = format(lubridate::today() - lubridate::days(day_idx), "%Y-%m-%d")
+
+          ## Make more efficeint -------
+          query = consults_db$find(sprintf('{"athlete_id": %s, "start_date_local": {"$regex": "%s"}}', strava_id, date_string))
+
+          tags$td(
+            tags$div(class="team_data", style={
+              if(nrow(query) > 1) {
+                "background-color: rgba(0,255,0,0.3);"
+              } else {
+                "background-color: rgba(80,80,80, 0.3);"
+              }}, {
+              if (nrow(query) > 0) {
+                nrow(query)
+              } else {
+                ""
+              }}
+            )
+          )
+        })
+      )
+    })
+  )
+}
+
+## Personal Tab -------
 construct_week_overview <- function(week_activities) {
   tags$table(class = "overview_table",
     tags$tr(

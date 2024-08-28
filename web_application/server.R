@@ -161,6 +161,10 @@ server <- function(input, output, session) {
     }}
   )
 
+  output$team_table <- shiny::renderUI({
+    construct_team_table(athlete_data, consults_db$find())
+  })
+
   output$athlete_activity_calendar <- shiny::renderUI({
     generate_calendar(
       input$activity_range_filter,
@@ -251,8 +255,6 @@ server <- function(input, output, session) {
 
     })
   )
-
-
 
   shiny::observeEvent(
     input$ab_submit_session,

@@ -11,18 +11,32 @@ connection_string = sprintf('mongodb+srv://%s:%s@cluster0.w6iufqn.mongodb.net/?r
 
 consults_db = mongo(collection="user_data", db="godiva_data", url=connection_string)
 athlete_db = mongo(collection="athlete_data", db="godiva_data", url=connection_string)
+```
 
-user_select <- unique(consults_db$find('{}')$athlete_id)
-names(user_select) <- paste("User ", user_select)
+```{r}
+consults_db$count()
+consults_db$iterate()$one()
 ```
 
 ```{r}
 sprintf('{"group": "%s"}', "REPS")
+q = consults_db$find('{}')
+user_select <- unique(consults_db$find('{}')$athlete_id)
+names(user_select) <- paste("User ", user_select)
+
 query = athlete_db$find(sprintf('{"group": "%s"}', "REPS"))
 ```
 
 ```{r}
-query = consults_db$find(sprintf('{"athlete_id":%s}', user_select[1]))
+query = consults_db$find(sprintf('{"athlete_id": %s, "sport_type": {"$regex": "Sw"}}', user_select[1]))
+
+query = consults_db$find(sprintf('{"athlete_id": %s, "start_date_local": {"$regex": "2024-06"}}', user_select[1]))
+# query = consults_db$find('{"sport_type": "Swim"}')
+
+# sprintf('{"athlete_id": %s, "sport_type": "Swim}', user_select[1]))
+# "start_date": {"$regex" : "/2024/"}
+
+query = consults_db$find(sprintf('{"date": {"$regex" : "2024"}}', user_select[1]))
 
 athlete_data = athlete_db$find()
 athlete_data <- athlete_data |> 
