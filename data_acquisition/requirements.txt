@@ -1,0 +1,7 @@
+pandas==
+google-oauth
+google-auth
+google-api-core
+google-api-python-client
+geopy
+jupyter

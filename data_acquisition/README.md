@@ -1,4 +1,4 @@
-# Scraping Strava Data
+# REPS - Data Acquisition
 
 ## Member data fields
 Each member has five data fields associated with them 

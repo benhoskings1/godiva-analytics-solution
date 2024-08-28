@@ -7,8 +7,7 @@ from googleapiclient.discovery import build
 
 # https://docs.google.com/forms/d/1hhyFgTs4-tEs-uevfLreNWbb_vzyW94s0Kroap3OTAk/edit
 
-SCOPES = ["https://www.googleapis.com/auth/forms",
-          "https://www.googleapis.com/auth/forms.responses.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/forms.responses.readonly"]
 
 
 class MemberManager:
@@ -31,3 +30,7 @@ class MemberManager:
                 token.write(self.creds.to_json())
 
         self.form_responses = None
+
+
+if __name__ == "__main__":
+    mgr = MemberManager()

@@ -16,10 +16,10 @@ class ActivityScraper:
         self.mongo_client = DBClient()
         self.athlete_data = self.mongo_client.activity_db.find()
 
-        # for athlete_id in self.tokens.index:
-        #     result = self.mongo_client.activity_db.find({"athlete_id": athlete_id})
-        #     current_data = pd.DataFrame(list(result))
-        #     print(athlete_id, current_data.shape[0])
+        for athlete_id in self.tokens.index:
+            result = self.mongo_client.activity_db.find({"athlete_id": athlete_id})
+            current_data = pd.DataFrame(list(result))
+            print(athlete_id, current_data.shape[0])
 
         self.activity_url = "https://www.strava.com/api/v3/activities"
         self.stream_keys = ["time", "distance", "altitude", "heartrate", "watts", "temp", "moving"]
@@ -53,11 +53,10 @@ class ActivityScraper:
 
         access_token = self.tokens.loc[athlete_id, "Access_token"]
         result = self.mongo_client.activity_db.find({"athlete_id": athlete_id})
-        print(result)
         current_data = pd.DataFrame(list(result), columns=detailed_activity_fields + ["athlete_id", "activity_id", "country"])
 
         current_data = current_data.sort_values(by=["start_date"], ascending=False)
-        print(current_data.head(10))
+        # print(current_data.head(10))
 
         min_date = datetime.now() - timedelta(weeks=10)
 
@@ -72,7 +71,6 @@ class ActivityScraper:
             request = requests.get(urlString)
             activities = request.json()
             if activities:
-                print(page)
                 for idx, activity in enumerate(activities):
                     try:
                         activity_id = activity["id"]
@@ -103,10 +101,11 @@ class ActivityScraper:
 
                             activity_data["data_streams"] = stream_data.to_dict(orient="list")
 
-                            self.mongo_client.upload_consult(activity_data[extract_activity_fields])
-                            # print(activity)
-                            newCount += 1
+                            self.mongo_client.upload_consult(
+                                {k: activity_data.get(k, None) for k in extract_activity_fields}
+                            )
 
+                            newCount += 1
                             new_activities = True
                         else:
                             new_activities = False
@@ -149,8 +148,9 @@ class ActivityScraper:
                 activity_stream = request.json()
                 stream_data[key] = activity_stream[key]["data"]
 
-            except:
-                print(f"couldn't find data for {key}")
+            except Exception as e:
+                pass
+                # print(f"couldn't find data for {key}")
 
         # stream_data = stream_data.set_index("time", drop=True)
         return stream_data
@@ -159,6 +159,6 @@ class ActivityScraper:
 if __name__ == "__main__":
     scraper = ActivityScraper()
     scraper.update_tokens()
-    scraper.update_athlete_data(38807221)
-    # scraper.update_all_athletes()
+    # scraper.update_athlete_data(38807221)
+    scraper.update_all_athletes()
 

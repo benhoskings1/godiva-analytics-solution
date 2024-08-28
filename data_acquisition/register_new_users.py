@@ -59,14 +59,19 @@ class MemberManager:
             user_data = {}
             for item in question_name_map.items():
                 # print(response)
-                data = response["answers"][item[1]]["textAnswers"]["answers"][0]["value"]
-                user_data[item[0]] = data
+                try:
+                    data = response["answers"][item[1]]["textAnswers"]["answers"][0]["value"]
+                    user_data[item[0]] = data
+                except KeyError:
+                    user_data[item[0]] = None
 
             response_data[response["responseId"]] = user_data
 
         return pd.DataFrame(response_data).transpose()
 
     def update_member_tokens(self):
+        # Used to automate new members joining filling out the REPS induction google form.
+
         access_data_path = "access_tokens.tsv"
 
         access_data = pd.read_csv(access_data_path, sep="\t")
@@ -117,6 +122,12 @@ class MemberManager:
 
 if __name__ == "__main__":
     manager = MemberManager()
+
+    responses = manager.get_responses("register")
+    responses["first_name"] = responses["First Name"]
+    responses["last_name"] = responses["Last Name"]
+    responses = responses.drop(["First Name", "Last Name"], axis=1)
+    print(responses.head(3))
 
     # # print(len(sys.argv))
     # if len(sys.argv) > 1:

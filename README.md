@@ -1,3 +1,21 @@
+# Coventry Godiva Data Analytics Solution
+
+This project is a full stack application that collects both qualitative and quantitative data about athletes, collating the 
+data into a simple overview for coaches to monitor the training progress of each of their athletes. 
+
+## Data pipelines
+Raw data is imported primarily through the Strava API. This data is then supplemented by additional qualitative data from 
+google forms (and thus the native API).
+
+For both Strava and Google Forms, the Crontab scheduler is used to automate the running of a python script that scrapes
+data from both input sources and send the data to MongoDB. 
+
+## Database management
+All data is held securely on the cloud using MongoDB. SQL is used to interface between python and the database.
+
+## Data Processing
+All data processing is 
+
 # Progress Tracking
 
 ## 1. Please click this link:

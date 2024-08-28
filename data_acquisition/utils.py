@@ -11,25 +11,42 @@ detailed_activity_fields = [
     "sport_type", "start_date", "start_date_local", "timezone",
     "start_latlang", "end_latlang", "achievement_count",
     "kudos_count", "comment_count", "athlete_count",
-    "total_photo_count", "trainer", "commute", "manual", "private",
-    "flagged", "workout_type", "average_speed", "max_speed", "has_kudoed",
-    "hide_from_home", "gear_id", "kilojoules", "average_watts", "device_watts",
-    "max_watts", "weighted_average_watts", "description", "calories", "device_name",
-    "embed_token", "splits_metric", "splits-standard", "laps", "best_efforts",
-    "segment_efforts"
+    "workout_type", "average_speed", "max_speed", "has_kudoed",
+    "hide_from_home", "gear_id", "average_watts", "device_watts",
+    "max_watts", "description", "device_name",
+    "embed_token", "splits_metric", "splits-standard", "laps",
 ]
 
 extract_activity_fields = [
     "id", "name", "distance", "moving_time", "elapsed_time",
     "total_elevation_gain", "elev_high", "elev_low",
     "sport_type", "start_date", "start_date_local", "manual", "private",
-    "flagged", "workout_type", "average_speed", "max_speed",
-    "hide_from_home", "gear_id", "kilojoules", "average_watts", "device_watts",
-    "max_watts", "weighted_average_watts", "description", "calories", "device_name",
+    "workout_type", "average_speed", "max_speed", "gear_id", "average_watts", "device_watts",
+    "max_watts", "weighted_average_watts", "description", "device_name",
     "splits_metric", "splits-standard", "laps", "best_efforts",
     "segment_efforts"
 ]
 
+# detailed_activity_fields = [
+#     "id", "name", "distance", "moving_time", "elapsed_time",
+#     "total_elevation_gain", "elev_high", "elev_low",
+#     "sport_type", "start_date", "start_date_local", "timezone",
+#     "start_latlang", "end_latlang", "achievement_count",
+#     "kudos_count", "comment_count", "athlete_count",
+#     "total_photo_count", "trainer", "commute", "manual", "private",
+#     "flagged", "workout_type", "average_speed", "max_speed", "has_kudoed",
+#     "hide_from_home", "gear_id", "kilojoules", "average_watts", "device_watts",
+#     "max_watts", "weighted_average_watts", "description", "calories", "device_name",
+#     "embed_token", "splits_metric", "splits-standard", "laps", "best_efforts",
+#     "segment_efforts"
+# ]
+
+# "elev_high", "elev_low",
+#     "sport_type", "start_date", "start_date_local", "manual", "private",
+#     "flagged", "workout_type", "average_speed", "max_speed", "gear_id", "average_watts", "device_watts",
+#     "max_watts", "weighted_average_watts", "description", "calories", "device_name",
+#     "splits_metric", "splits-standard", "laps", "best_efforts",
+#     "segment_efforts"
 
 def get_activity_country(coords):
     # coords = coords.replace("[", "").replace("]", "").split(", ")
