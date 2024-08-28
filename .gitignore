@@ -5,3 +5,5 @@
 web_application/credential_creation.R
 renv
 renv.lock
+
+data_aquisition/api_credentials/
