@@ -8,3 +8,4 @@ renv.lock
 
 # API creds hidden
 data_acquisition/api_credentials/
+data_preparation/
