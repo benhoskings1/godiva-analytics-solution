@@ -12,8 +12,8 @@ title                    : "Godiva Analytics Hub"
 title_separator          : "-"
 name                     : &name "Godiva Analytics Hub"
 description              : &description "Support site for godiva data analytics"
-url                      : https://benhoskings1.github.io # the base hostname & protocol for your site e.g.
-baseurl                  : "" # the subpath of your site, e.g. "/blog"
+url                      : "/godiva-analytics-solution" # the base hostname & protocol for your site e.g.
+baseurl                  : https://benhoskings1.github.io # the subpath of your site, e.g. "/blog"
 repository               : "godiva-analytics-solution"
 teaser                   :  # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 breadcrumbs              : false # true, false (default)
@@ -82,7 +82,7 @@ analytics:
 # Site Author
 author:
   name             : "Coventry Godiva Harriers"
-  avatar           : "godiva-analytics-solution/images/Coventry_Logo.png"
+  avatar           : "Coventry_Logo.png"
   # bio              : "4th Year Systems Engineer"
   location         : "Coventry"
   # employer         : "University of Warwick"
