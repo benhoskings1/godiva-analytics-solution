@@ -95,15 +95,15 @@ class ActivityScraper:
                             except KeyError:
                                 country = None
 
-                            activity_data["athlete_id"] = activity_data["athlete"]["id"]
-                            activity_data["country"] = country
-                            activity_data["activity_id"] = activity_data["id"]
+                            activity_data_ext = {k: activity_data.get(k, None) for k in extract_activity_fields}
 
-                            activity_data["data_streams"] = stream_data.to_dict(orient="list")
+                            activity_data_ext["athlete_id"] = activity_data["athlete"]["id"]
+                            activity_data_ext["country"] = country
+                            activity_data_ext["activity_id"] = activity_data["id"]
 
-                            self.mongo_client.upload_consult(
-                                {k: activity_data.get(k, None) for k in extract_activity_fields}
-                            )
+                            activity_data_ext["data_streams"] = stream_data.to_dict(orient="list")
+
+                            self.mongo_client.upload_consult(activity_data_ext)
 
                             newCount += 1
                             new_activities = True
