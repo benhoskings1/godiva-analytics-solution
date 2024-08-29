@@ -1,5 +1,5 @@
 ---
-permalink: /
+permalink: /godiva-analytics-solution/
 title: "About the App"
 excerpt: "About the App"
 author_profile: true
