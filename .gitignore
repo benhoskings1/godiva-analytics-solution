@@ -6,4 +6,5 @@ web_application/credential_creation.R
 renv
 renv.lock
 
+# API creds hidden
 data_acquisition/api_credentials/

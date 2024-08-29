@@ -1,6 +1,7 @@
 import pandas as pd
 
 from utils import *
+import json
 from datetime import datetime, timedelta
 from dbclient import DBClient
 import warnings
@@ -8,8 +9,16 @@ import warnings
 
 class ActivityScraper:
     def __init__(self):
-        self.clientID = 111130
-        self.clientSecret = 'b7fca9288af24aaa2f86f1b82f70f2baa54daeb2'
+
+        creds = None
+        with open('api_credentials/strava_credentials.json') as f:
+            creds = json.load(f)
+
+        if not creds:
+            raise ValueError("No credentials provided")
+
+        self.clientID = creds["client_id"]
+        self.clientSecret = creds["client_secret"]
         self.tokens = pd.read_csv("access_tokens.tsv", sep="\t", index_col=0)
         # self.allActivities = pd.read_csv("data/Activities.tsv", sep="\t", index_col="Activity_ID")
 
