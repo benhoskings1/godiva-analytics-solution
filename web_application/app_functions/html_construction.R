@@ -3,8 +3,8 @@
 construct_team_table <- function(athlete_data, all_activities) {
   tags$table(class="team_table",
     tags$tr(class="team_row",
-      tags$th(style="text-align: left; padding: 0.5em", "Athlete"),
-      purrr::map(1:14, function(day_idx) {
+      tags$th(style="text-align: left; padding: 0.5em; width: 30%;", "Athlete"),
+      purrr::map(13:0, function(day_idx) {
         tags$th(style="padding: 0.5em; width: 2em;",
           substr(
             format(lubridate::today() - lubridate::days(day_idx), "%A"), 1, 1
@@ -30,15 +30,15 @@ construct_team_table <- function(athlete_data, all_activities) {
             dplyr::slice(athlete_idx) |>
             dplyr::pull(full_name)
         ),
-        purrr::map(1:14, function(day_idx) {
+        purrr::map(13:0, function(day_idx) {
           date_string = format(lubridate::today() - lubridate::days(day_idx), "%Y-%m-%d")
 
           ## Make more efficeint -------
-          query = consults_db$find(sprintf('{"athlete_id": %s, "start_date_local": {"$regex": "%s"}}', strava_id, date_string))
+          query = activity_db$find(sprintf('{"athlete_id": %s, "start_date_local": {"$regex": "%s"}}', strava_id, date_string), fields = '{"distance": true}')
 
           tags$td(
             tags$div(class="team_data", style={
-              if(nrow(query) > 1) {
+              if(nrow(query) > 0) {
                 "background-color: rgba(0,255,0,0.3);"
               } else {
                 "background-color: rgba(80,80,80, 0.3);"

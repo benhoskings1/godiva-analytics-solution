@@ -129,8 +129,9 @@
 }
 
 .team_data {
+  font-size: 16px;
   background-color: inherit; aspect-ratio: 1 / 1;
-  padding: .5em; border: none; border-radius:50%;
-  height: 80%;
+  border: none; border-radius:50%;
+  height: 80%; max-height: 36px;
   display: flex; justify-content: center; align-items: center;
 }

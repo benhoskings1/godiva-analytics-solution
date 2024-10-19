@@ -59,13 +59,25 @@ v_prepared_data_path <- "data/prepared_data/"
 v_database_path <- base::paste(v_prepared_data_path, "Coventry_Godiva.db", sep="")
 
 # load data from Mongo DB -------
+extract_activity_fields = c(
+  "id", "name", "distance", "moving_time", "elapsed_time",
+  "total_elevation_gain", "elev_high", "elev_low",
+  "sport_type", "start_date", "start_date_local", "manual", "private",
+  "workout_type", "average_speed", "max_speed", "gear_id", "average_watts", "device_watts",
+  "max_watts", "weighted_average_watts", "description", "device_name",
+  "splits_metric", "splits-standard", "laps", "best_efforts",
+  "segment_efforts"
+)
+
+
 username = 'benjaminhoskings'
 password = 'i6UMmr7TpOcIOUcc'
 
 connection_string = sprintf('mongodb+srv://%s:%s@cluster0.w6iufqn.mongodb.net/?retryWrites=True&w=majority&appName=Cluster0', username, password)
 
-consults_db = mongo(collection="user_data", db="godiva_data", url=connection_string)
+activity_db = mongo(collection="activity_data", db="godiva_data", url=connection_string)
 athlete_db = mongo(collection="athlete_data", db="godiva_data", url=connection_string)
+
 athlete_data = athlete_db$find()
 athlete_data <- athlete_data |>
   dplyr::mutate(full_name = paste(first_name, last_name, sep = " "))
@@ -73,7 +85,10 @@ athlete_data <- athlete_data |>
 athlete_id_map <- athlete_data$strava_id
 names(athlete_id_map) <- athlete_data$full_name
 
-user_select <- unique(consults_db$find('{}')$athlete_id)
+query_string = paste0('{"', paste(extract_activity_fields, collapse ='": true, "'), '": true}');
+q = activity_db$find(fields=query_string)
+
+user_select <- unique(activity_db$find(fields='{"athlete_id": true}')$athlete_id)
 names(user_select) <- paste("User ", user_select)
 
 
@@ -89,11 +104,7 @@ activity_graph_options = list(
 # activity_data <- readr::read_tsv(base::paste(v_prepared_data_path,"Activities.tsv", sep=""), show_col_types = FALSE)
 e = simpleError("No internet connection")
 
-# activities_detailed <- activities_detailed |>
-#   dplyr::mutate(distance_m = distance,
-#                 distance_yd = distance_m * 1.0936132983,
-#                 distance_km = distance / 1000,
-#                 distance_miles = distance_km * 0.6213711922)
+
 
 if (base::file.exists(base::paste(v_prepared_data_path, "session_data.tsv", sep=""))) {
   session_record_all <- readr::read_tsv(

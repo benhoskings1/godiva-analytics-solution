@@ -79,7 +79,7 @@ server <- function(input, output, session) {
     eventExpr = input$athlete_filter,
     handlerExpr = {
 
-      db_query = consults_db$find(sprintf('{"athlete_id":%s}', input$athlete_filter))
+      db_query = activity_db$find(sprintf('{"athlete_id":%s}', input$athlete_filter))
       reactive_vals$athlete_activities = map_db_to_list(db_query)
 
       reactive_vals$activity_overviews <- generate_activity_overview(reactive_vals$athlete_activities)
@@ -162,7 +162,7 @@ server <- function(input, output, session) {
   )
 
   output$team_table <- shiny::renderUI({
-    construct_team_table(athlete_data, consults_db$find())
+    construct_team_table(athlete_data, activity_db$find())
   })
 
   output$athlete_activity_calendar <- shiny::renderUI({
