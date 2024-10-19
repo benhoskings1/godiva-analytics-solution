@@ -2,8 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
 web_application/credential_creation.R
-renv
+renv/
 renv.lock
 
 # API creds hidden
