@@ -2,12 +2,18 @@ from pymongo import MongoClient
 import pandas as pd
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+import json
 
 class DBClient:
     def __init__(self):
-        username = 'benjaminhoskings'
-        password = 'nW1O55mofKw8Dy7V'
-        self.client = MongoClient(f'mongodb+srv://{username}:{password}@cluster0.w6iufqn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+        creds = None
+        with open('api_credentials/mongo_credentials.json') as f:
+            creds = json.load(f)
+
+        if not creds:
+            raise ValueError("No credentials provided")
+
+        self.client = MongoClient(f'mongodb+srv://{creds["username"]}:{creds["password"]}@cluster0.w6iufqn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
         self.collections = {
             "members": self.client.get_database("godiva_data").members,
             "athletes": self.client.get_database("godiva_data").athletes,
