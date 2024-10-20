@@ -6,7 +6,7 @@ from pymongo.server_api import ServerApi
 class DBClient:
     def __init__(self):
         username = 'benjaminhoskings'
-        password = 'i6UMmr7TpOcIOUcc'
+        password = 'nW1O55mofKw8Dy7V'
         self.client = MongoClient(f'mongodb+srv://{username}:{password}@cluster0.w6iufqn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
         self.collections = {
             "members": self.client.get_database("godiva_data").members,
@@ -15,12 +15,12 @@ class DBClient:
             "activities": self.client.get_database("godiva_data").activities,
             "session_types": self.client.get_database("godiva_data").session_types,
             "access_types": self.client.get_database("godiva_data").access_types,
+            "logins": self.client.get_database("godiva_data").member_login_details,
         }
 
         self.activity_db = self.client.get_database('godiva_data').activity_data
         self.member_data = self.client.get_database("godiva_data").athlete_data
         self.coaches = self.client.get_database("godiva_data").coaches
-
 
     def check_connection(self):
         try:
@@ -46,6 +46,12 @@ class DBClient:
     def upload_consult(self, new_consult):
         self.activity_db.insert_one(new_consult)
         print('New consultation data uploaded to MongoDB.')
+
+    def get_object_field(self, collection_name, field_name, query):
+        return self.collections[collection_name].find_one(query)[field_name]
+
+    def get_object_id(self, collection_name, query):
+        return self.get_object_field(collection_name, "_id", query)
 
 
 if __name__ == "__main__":

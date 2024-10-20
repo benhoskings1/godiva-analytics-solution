@@ -3,6 +3,10 @@
 .RData
 .Ruserdata
 
+.idea
+
+*/.DS_Store
+
 web_application/credential_creation.R
 renv/
 renv.lock
@@ -11,3 +15,4 @@ renv.lock
 data_acquisition/api_credentials/
 data_preparation/
 data_acquisition/access_tokens.tsv
+

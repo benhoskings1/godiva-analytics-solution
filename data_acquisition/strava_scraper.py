@@ -33,6 +33,10 @@ class ActivityScraper:
         self.activity_url = "https://www.strava.com/api/v3/activities"
         self.stream_keys = ["time", "distance", "altitude", "heartrate", "watts", "temp", "moving"]
 
+    def update_token_db(self):
+        athlete_ids = self.mongo_client.collections["athletes"].distinct("stravaID")
+        print(athlete_ids)
+
     def update_tokens(self):
         for athlete_ID in self.tokens.index:
             if pd.isna(self.tokens.loc[athlete_ID, "Expires_at"]) or \
@@ -168,6 +172,7 @@ class ActivityScraper:
 if __name__ == "__main__":
     scraper = ActivityScraper()
     scraper.update_tokens()
+    scraper.update_token_db()
     # scraper.update_athlete_data(38807221)
-    scraper.update_all_athletes()
+    # scraper.update_all_athletes()
 
