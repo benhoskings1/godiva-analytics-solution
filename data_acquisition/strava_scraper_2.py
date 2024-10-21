@@ -170,7 +170,7 @@ class ActivityScraper:
         strava_ids = self.mongo_client.collections["athletes"].distinct("stravaId")
 
         for strava_id in strava_ids:
-            self.update_athlete_activities(strava_id, force_continue=True)
+            self.update_athlete_activities(strava_id, force_continue=False)
 
     def update_tokens(self):
         for athlete_ID in self.tokens.index:
