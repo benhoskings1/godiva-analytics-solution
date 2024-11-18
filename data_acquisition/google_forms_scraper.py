@@ -7,25 +7,25 @@ from googleapiclient.discovery import build
 
 # https://docs.google.com/forms/d/1hhyFgTs4-tEs-uevfLreNWbb_vzyW94s0Kroap3OTAk/edit
 
-SCOPES = ["https://www.googleapis.com/auth/forms.responses.readonly"]
-
+SCOPES = ["https://www.googleapis.com/auth/forms.body",
+          "https://www.googleapis.com/auth/forms.responses.readonly"]
 
 class MemberManager:
     def __init__(self):
-        self.creds = Credentials.from_authorized_user_file("api_credentials/forms_api_token.json", SCOPES)
+        self.creds = Credentials.from_authorized_user_file("api_credentials/forms_api_credentials.json", SCOPES)
 
         if not self.creds.valid:
             print("updating creds")
-            if self.creds and self.creds.expired and self.creds.refresh_token:
+            if self.creds and self.creds.expired and self.creds.refresh_token and 0:
                 self.creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    "api_credentials/credentials.json", SCOPES
+                    "api_credentials/forms_api_credentials.json", SCOPES
                 )
                 self.creds = flow.run_local_server(port=0)
 
             # Save the credentials for the next run
-            with open("api_credentials/forms_api_token.json", "w") as token:
+            with open("api_credentials/forms_api_credentials_2.json", "w") as token:
                 print("writing_token")
                 token.write(self.creds.to_json())
 
