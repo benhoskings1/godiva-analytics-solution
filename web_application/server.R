@@ -13,21 +13,52 @@ server <- function(input, output, session) {
     user = NULL
   )
 
+  AT_REACTIVE_VALS <- shiny::reactiveValues(
+    all_activities = NULL,
+    week_activities = NULL
+  )
+
   shiny::observe({
    user_info <- shiny::reactiveValuesToList(auth)$user_info
    if (!is.null(user_info)) {
-     user_data = db_tables$members$find(
-       query = sprintf('{"_id": {"$oid": "%s"}}', user_info$memberId),
-       fields = '{"_id": true, "first_name": true, "last_name": true, "accessId": true}')
+     user_data = query_user_details(member_id = user_info$memberId)
 
      user_data <- user_data |>
-       dplyr::mutate(display_name = paste(first_name, last_name))
+       dplyr::mutate(
+         display_name = paste(first_name, last_name),
+         athlete_id = query_athlete_id(`_id`)
+      )
 
      GLB_REACTIVE_VALS$user <- user_data
 
      print(GLB_REACTIVE_VALS$user)
    }
   })
+
+  shiny::observeEvent(
+    eventExpr = {GLB_REACTIVE_VALS$user},
+    handlerExpr = {
+      if(!is.null(GLB_REACTIVE_VALS$user$athlete_id)) {
+        AT_REACTIVE_VALS$all_activities <- query_athlete_activities(
+          athlete_id = GLB_REACTIVE_VALS$user$athlete_id
+        )
+
+        AT_REACTIVE_VALS$week_activities <- query_athlete_activities(
+          athlete_id = GLB_REACTIVE_VALS$user$athlete_id,
+          start_date = today,
+          end_date = today - lubridate::days(7)
+        )
+      }
+
+
+      if(!is.null(AT_REACTIVE_VALS$all_activities)) {
+        print(AT_REACTIVE_VALS$all_activities |> utils
+              ::head(1))
+        print(nrow(AT_REACTIVE_VALS$all_activities))
+        print(nrow(AT_REACTIVE_VALS$week_activties))
+      }
+    }
+  )
 
   output$welcome_greeting <- shiny::renderText(
     if (!is.null(GLB_REACTIVE_VALS$user)) {
@@ -36,6 +67,18 @@ server <- function(input, output, session) {
       "Unverified User"
     }
   )
+
+  output$athlete_tab <- shiny::renderUI(
+    if(!is.null(GLB_REACTIVE_VALS$user)) {
+
+      create_athlete_tab_2()
+    }
+  )
+
+  output$AT_athlete_week_overview <- shiny::renderUI(
+    tags$div("Hello")
+  )
+
   #
   # app_settings <- shiny::reactiveValues(
   #   units = list("Run"="imperial", "Swim"="metric", "Ride"="imperial"),

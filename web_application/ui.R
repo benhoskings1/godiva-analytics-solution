@@ -21,7 +21,6 @@ ui <- shiny::fluidPage(
 
   # Auth screen ------
   shinymanager::auth_ui(
-
     id = "auth",
     tags_top = tags$div(
       tags$h4("Coventry Godiva Athelete Portal", style="align:center"),
@@ -72,12 +71,16 @@ ui <- shiny::fluidPage(
             shiny::textOutput("welcome_greeting")
           )
         )
-      )
+      ),
 
       # Athlete Tab ---------
-      # shiny::tabPanel(
-      #   value = "athlete_tab",
-      #   title = tags$div(class="tab_title", "Athlete Overview"),
+
+
+      shiny::tabPanel(
+        value = "athlete_tab",
+        title = tags$div(class="tab_title", "Athlete Overview"),
+        shiny::uiOutput("athlete_tab")
+      )
       #   shiny::wellPanel(
       #     style = "background: white;",
       #     tags$div(class="profile_layout",

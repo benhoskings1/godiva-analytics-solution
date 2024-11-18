@@ -51,6 +51,8 @@ html_loading_screen <- shiny::tagList(
 base::source("app_functions/main_functions.R")
 base::source("app_functions/html_construction.R")
 base::source("app_functions/graph_construction.R")
+base::source("app_functions/AT_ATHLETE_TAB_2.R")
+base::source("app_functions/sql_queries.R")
 
 
 # Define useful paths ---
@@ -76,5 +78,16 @@ athlete_member_ids = db_tables$athletes$find(fields = '{"memberId": true}', quer
 coach_ids = db_tables$coaches$find(fields = '{"memberId": true}', query='{}')$`memberId`
 
 user_logins = db_tables$logins$find('{}')
+
+today = lubridate::today()
+week_days <- c(
+  "Monday" = 1,
+  "Tuesday"=  2,
+  "Wednesday" = 3,
+  "Thursday" = 4,
+  "Friday" = 5,
+  "Saturday" = 6,
+  "Sunday" = 7
+)
 
 
